@@ -652,9 +652,14 @@ function get_price_list_manage_table_headers()
 
     $headers = array(
         array('price_list_id' => $CI->lang->line('price_lists_id')),
+        array('code' => $CI->lang->line('price_lists_code')),
         array('name' => $CI->lang->line('price_lists_name')),
-        array('description' => $CI->lang->line('price_lists_description'))
+        array('description' => $CI->lang->line('price_lists_description')),
+        array('created_at' => $CI->lang->line('price_lists_created_at'))
     );
+
+    //additional for view the item list
+    $headers[] = [ 'items' => '', 'sortable' => false ];
 
     return transform_headers($headers);
 }
@@ -667,13 +672,63 @@ function get_price_list_data_row($price_list)
     $CI =& get_instance();
     $controller_name = strtolower(get_class($CI));
 
-    return array (
+    return [
         'price_list_id' => $price_list->id,
         'name' => $price_list->name,
+        'code' => $price_list->code,
         'description' => $price_list->description,
-        'edit' => anchor($controller_name."/view/$price_list->id", '<span class="glyphicon glyphicon-edit"></span>',
-            array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
-        ));
+        'created_at' => date("d/m/Y H:i", strtotime($price_list->created_at)),
+        'edit' => anchor(
+        	$controller_name."/view/$price_list->id",
+			'<span class="glyphicon glyphicon-edit"></span>',
+            array(
+            	'class' => 'modal-dlg',
+				'data-btn-submit' => $CI->lang->line('common_submit'),
+				'title' => $CI->lang->line($controller_name.'_update')
+			)
+        ),
+        'items' => anchor(
+            $controller_name."/items/".$price_list->id,
+            '<span class="glyphicon glyphicon-usd"></span>',
+            [
+                'title' => $CI->lang->line($controller_name.'_items')
+            ]
+        )];
 }
 
+function get_price_list_items_table_headers()
+{
+    $CI =& get_instance();
+
+    $headers = array(
+        array('id' => $CI->lang->line('price_lists_item_id')),
+        array('code' => $CI->lang->line('price_lists_code')),
+        array('item_name' => $CI->lang->line('price_lists_name')),
+        array('unit_price' => $CI->lang->line('price_lists_unit_price')),
+        array('created_at' => $CI->lang->line('price_lists_created_at'))
+    );
+
+    return transform_headers($headers);
+}
+
+function get_price_list_items_data_row($item) {
+    $CI =& get_instance();
+    $controller_name = strtolower(get_class($CI));
+
+    return [
+        'id' => $item->id,
+        'code' => $item->price_list_code,
+        'item_name' => $item->item_name,
+        'unit_price' => $item->unit_price,
+        'created_at' => date("d/m/Y H:i", strtotime($item->created_at)),
+        'edit' => anchor(
+            $controller_name ."/view_list/". $item->id,
+            '<span class="glyphicon glyphicon-edit"></span>',
+            array(
+                'class' => 'modal-dlg',
+                'data-btn-submit' => $CI->lang->line('common_submit'),
+                'title' => $CI->lang->line($controller_name.'_update')
+            )
+        )];
+}
 ?>

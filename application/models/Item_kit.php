@@ -149,7 +149,7 @@ class Item_kit extends CI_Model
 	*/
 	public function delete($item_kit_id)
 	{
-		return $this->db->delete('item_kits', array('item_kit_id' => $id));
+		return $this->db->delete('item_kits', array('item_kit_id' => $item_kit_id));
 	}
 
 	/*

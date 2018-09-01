@@ -226,10 +226,14 @@
 		options = _options;
 		enable_actions = enable_actions(options.enableActions);
 		load_success = load_success(options.onLoadSuccess);
+		the_url = options.resource + '/search';
+		if (options.custom_resource) {
+            the_url = options.custom_resource;
+		}
 		$('#table').bootstrapTable($.extend(options, {
 			columns: options.headers,
 			stickyHeader: true,
-			url: options.resource + '/search',
+			url: the_url,
 			sidePagination: 'server',
 			pageSize: options.pageSize,
 			striped: true,

@@ -16,6 +16,18 @@
 			</div>
 		</div>
 
+        <div class="form-group form-group-sm">
+            <?php echo form_label($this->lang->line('price_lists_code'), 'code', array('class'=>'required control-label col-xs-3')); ?>
+            <div class='col-xs-8'>
+                <?php echo form_input(array(
+                        'name'=>'code',
+                        'id'=>'code',
+                        'class'=>'form-control input-sm',
+                        'value'=>$price_list_info->code)
+                );?>
+            </div>
+        </div>
+
 		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('price_lists_description'), 'description', array('class'=>'control-label col-xs-3')); ?>
 			<div class='col-xs-8'>

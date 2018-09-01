@@ -1,22 +1,13 @@
 <?php $this->load->view("partial/header"); ?>
 
 <script type="text/javascript">
-$(document).ready(function()
-{
+$(document).ready(function() {
 	<?php $this->load->view('partial/bootstrap_tables_locale'); ?>
 	table_support.init({
 		resource: '<?php echo site_url($controller_name);?>',
 		headers: <?php echo $table_headers; ?>,
 		pageSize: <?php echo $this->config->item('lines_per_page'); ?>,
 		uniqueId: 'price_list_id'
-	});
-
-	$('#generate_barcodes').click(function()
-	{
-		window.open(
-			'index.php/item_kits/generate_barcodes/'+table_support.selected_ids().join(':'),
-			'_blank' // <- This is what makes it open in a new window.
-		);
 	});
 });
 
@@ -33,10 +24,6 @@ $(document).ready(function()
 	<div class="pull-left btn-toolbar">
 		<button id="delete" class="btn btn-default btn-sm">
 			<span class="glyphicon glyphicon-trash">&nbsp</span><?php echo $this->lang->line("common_delete"); ?>
-		</button>
-
-		<button id="generate_barcodes" class="btn btn-default btn-sm" data-href='<?php echo site_url($controller_name."/generate_barcodes"); ?>'>
-			<span class="glyphicon glyphicon-barcode">&nbsp</span><?php echo $this->lang->line("items_generate_barcodes");?>
 		</button>
 	</div>
 </div>

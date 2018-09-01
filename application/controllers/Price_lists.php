@@ -103,48 +103,35 @@ class Price_lists extends Secure_Controller
 
 		$data['price_list_info']  = $info;
 
-		$items = array();
-
-		foreach($this->Price_list_items->get_info($item_kit_id) as $price_list_item)
-		{
-            $item['id'] = $this->xss_clean($price_list_item['id']);
-			$item['name'] = $this->xss_clean($price_list_item['item_name']);
-			$item['price_list_id'] = $this->xss_clean($price_list_item['price_list_id']);
-			$item['unit_price'] = $this->xss_clean($price_list_item['unit_price']);
-
-			$items[] = $item;
-		}
-
-		$data['price_list_items'] = $items;
-
 		$this->load->view("price_lists/form", $data);
 	}
 	
 	public function save($id = -1)
 	{
-		$data = array(
+		$data = [
 			'name' => $this->input->post('name'),
-			'description' => $this->input->post('description')
-		);
+			'code' => $this->input->post('code'),
+			'description' => $this->input->post('description'),
+			'updated_at' => date("Y-m-d H:i:s")
+		];
+        if($id == -1) {
+            $data['created_at'] = date("Y-m-d H:i:s");
+        }
 		
 		if($this->Price_list->save($data, $id))
 		{
 			$success = true;
             $new_item = false;
             //New item kit
-            if($id == -1)
-            {
-                $id = $data['id'];
+            if($id == -1) {
                 $new_item = true;
             }
 
 			$item_kit_data = $this->xss_clean($data);
 
-			if($new_item)
-			{
+			if($new_item) {
 				echo json_encode(array('success' => $success,
 					'message' => $this->lang->line('price_lists_successful_adding').' '.$item_kit_data['name'], 'id' => $id));
-
 			}
 			else
 			{
@@ -163,12 +150,14 @@ class Price_lists extends Secure_Controller
 	
 	public function delete()
 	{
-		$id = $this->xss_clean($this->input->post('id'));
-
-		echo json_encode(array('success' => TRUE,
-								'message' => $this->lang->line('item_kits_successful_deleted').' '.count($item_kits_to_delete).' '.$this->lang->line('item_kits_one_or_multiple')));
-		echo json_encode(array('success' => FALSE,
-								'message' => $this->lang->line('item_kits_cannot_be_deleted')));
+		$ids = $this->xss_clean($this->input->post('ids'));
+        if($this->Price_list->delete_list($ids)) {
+            echo json_encode(array('success' => TRUE,
+                'message' => $this->lang->line('price_lists_successful_deleted').' '.$this->lang->line('price_lists_one_or_multiple')));
+		} else {
+            echo json_encode(array('success' => FALSE,
+                'message' => $this->lang->line('price_lists_cannot_be_deleted')));
+		}
 	}
 	
 	public function generate_barcodes($item_kit_ids)
@@ -201,5 +190,47 @@ class Price_lists extends Secure_Controller
 		// display barcodes
 		$this->load->view("barcodes/barcode_sheet", $data);
 	}
+
+    public function items()
+    {
+        $data['table_headers'] = $this->xss_clean(get_price_list_items_table_headers());
+
+        $this->load->view('price_lists/items', $data);
+    }
+
+    public function search_items()
+    {
+        $search = $this->input->get('search');
+        $limit  = $this->input->get('limit');
+        $offset = $this->input->get('offset');
+        $sort   = $this->input->get('sort');
+        $order  = $this->input->get('order');
+
+        $price_lists = $this->Price_list_items->search($search, $limit, $offset, $sort, $order);
+        $total_rows = $this->Price_list_items->get_found_rows($search);
+
+        $data_rows = array();
+        foreach($price_lists->result() as $price_list) {
+            $data_rows[] = $this->xss_clean(get_price_list_items_data_row($price_list));
+        }
+
+        echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
+    }
+
+    public function view_list($id = -1) {
+        $info = $this->Price_list_items->get_info($id);
+
+        if($id == -1) {
+            $info->price_list_id = 0;
+        }
+        foreach(get_object_vars($info) as $property => $value)
+        {
+            $info->$property = $this->xss_clean($value);
+        }
+
+        $data['price_list_info']  = $info;
+
+        $this->load->view("price_lists/form_items", $data);
+    }
 }
 ?>

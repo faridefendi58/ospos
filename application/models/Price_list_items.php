@@ -11,15 +11,29 @@ class Price_list_items extends CI_Model
     */
     public function get_info($price_list_id)
     {
-        $this->db->select('t.id, t.price_list_id, v.name AS list_name, t.unit_price, u.name AS item_name');
+        $this->db->select('t.id, t.price_list_id, v.name AS list_name, v.code, t.unit_price, u.name AS item_name');
         $this->db->from('price_list_items as t');
         $this->db->join('items as u', 'u.item_id = t.item_id');
         $this->db->join('price_lists as v', 'v.id = t.price_list_id');
         $this->db->where('t.id', $price_list_id);
         $this->db->order_by('t.id', 'asc');
 
-        //return an array of item kit items for an item
-        return $this->db->get()->result_array();
+        $query = $this->db->get();
+
+        if($query->num_rows()==1) {
+            return $query->row();
+        } else {
+            //Get empty base parent object, as $price_list_id is NOT an item kit
+            $item_obj = new stdClass();
+
+            //Get all the fields from items table
+            foreach($this->db->list_fields('price_list_items') as $field)
+            {
+                $item_obj->$field = '';
+            }
+
+            return $item_obj;
+        }
     }
 
     /*
@@ -57,6 +71,55 @@ class Price_list_items extends CI_Model
     public function delete($price_list_id)
     {
         return $this->db->delete('price_list_items', array('price_list_id' => $price_list_id));
+    }
+
+    public function exists($id) {
+        $this->db->from('price_list_items');
+        $this->db->where('id', $id);
+
+        return ($this->db->get()->num_rows() == 1);
+    }
+
+    public function get_total_rows() {
+        $this->db->from('price_list_items');
+
+        return $this->db->count_all_results();
+    }
+
+    public function get_found_rows($search) {
+        return $this->search($search, 0, 0, 'item_id', 'asc', TRUE);
+    }
+
+    public function search($search, $rows = 0, $limit_from = 0, $sort = 'item_id', $order = 'asc', $count_only = FALSE)
+    {
+        // get_found_rows case
+        if($count_only == TRUE)
+        {
+            $this->db->select('COUNT(t.id) as count');
+        } else {
+            $this->db->select('t.*, i.name AS item_name, l.code AS price_list_code, l.name AS price_list_name');
+        }
+
+        $this->db->from('price_list_items AS t');
+        $this->db->join('items as i', 'i.item_id = t.item_id');
+        $this->db->join('price_lists as l', 'l.id = t.price_list_id');
+        $this->db->like('i.name', $search);
+        $this->db->or_like('i.description', $search);
+
+        // get_found_rows case
+        if($count_only == TRUE)
+        {
+            return $this->db->get()->row()->count;
+        }
+
+        $this->db->order_by($sort, $order);
+
+        if($rows > 0)
+        {
+            $this->db->limit($rows, $limit_from);
+        }
+
+        return $this->db->get();
     }
 }
 ?>

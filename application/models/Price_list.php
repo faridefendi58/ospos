@@ -18,25 +18,6 @@ class Price_list extends CI_Model
     }
 
     /*
-    Check if a given item_id is an item kit
-    */
-    public function is_valid_price_list($id)
-    {
-        if(!empty($id))
-        {
-            //KIT #
-            $pieces = explode(' ', $id);
-
-            if(count($pieces) == 2 && preg_match('/(KIT)/i', $pieces[0]))
-            {
-                return $this->exists($pieces[1]);
-            }
-        }
-
-        return FALSE;
-    }
-
-    /*
     Gets total of rows
     */
     public function get_total_rows()
@@ -53,22 +34,20 @@ class Price_list extends CI_Model
     {
         $this->db->select('
 		id,
-		price_lists.name as name,
-		price_lists.description,
-		price_lists.created_at,
-		price_lists.updated_at');
+		name as name,
+		code,
+		description,
+		created_at,
+		updated_at');
 
         $this->db->from('price_lists');
         $this->db->where('id', $id);
 
         $query = $this->db->get();
 
-        if($query->num_rows()==1)
-        {
+        if($query->num_rows()==1) {
             return $query->row();
-        }
-        else
-        {
+        } else {
             //Get empty base parent object, as $price_list_id is NOT an item kit
             $item_obj = new stdClass();
 
@@ -117,24 +96,38 @@ class Price_list extends CI_Model
     }
 
     /*
-    Deletes one item kit
+    Delete one price list
     */
-    public function delete($price_list_id)
-    {
-        return $this->db->delete('price_lists', array('price_list_id' => $price_list_id));
+    public function delete($id){
+        if (!$this->exists($id)) {
+            return false;
+        }
+
+        $del1 = $this->db->delete('price_lists', array('id' => $id));
+        if ($del1) {
+            $this->db->where_in('price_list_id', $id);
+            $del2 = $this->db->delete('price_list_items');
+            return true;
+        }
+
+        return false;
     }
 
     /*
-    Deletes a list of price lists
-    */
-    public function delete_list($price_list_ids)
+	Deletes a list of price list
+	*/
+    public function delete_list($ids)
     {
-        $this->db->where_in('price_list_id', $price_list_ids);
+        $this->db->where_in('id', $ids);
+        $del1 = $this->db->delete('price_lists');
 
-        return $this->db->delete('price_lists');
+        $this->db->where_in('price_list_id', $ids);
+        $del2 = $this->db->delete('price_list_items');
+
+        return $del1;
     }
 
-    public function get_search_suggestions($search, $limit = 25)
+    /*public function get_search_suggestions($search, $limit = 25)
     {
         $suggestions = array();
 
@@ -163,13 +156,12 @@ class Price_list extends CI_Model
         }
 
         //only return $limit suggestions
-        if(count($suggestions) > $limit)
-        {
+        if(count($suggestions) > $limit) {
             $suggestions = array_slice($suggestions, 0, $limit);
         }
 
         return $suggestions;
-    }
+    }*/
 
     /*
    Gets rows
