@@ -643,4 +643,37 @@ function get_expenses_manage_payments_summary($payments, $expenses)
 	return $table;
 }
 
+/*
+Get the header for the price list tabular view
+*/
+function get_price_list_manage_table_headers()
+{
+    $CI =& get_instance();
+
+    $headers = array(
+        array('price_list_id' => $CI->lang->line('price_lists_id')),
+        array('name' => $CI->lang->line('price_lists_name')),
+        array('description' => $CI->lang->line('price_lists_description'))
+    );
+
+    return transform_headers($headers);
+}
+
+/*
+Get the html data row for the price_list
+*/
+function get_price_list_data_row($price_list)
+{
+    $CI =& get_instance();
+    $controller_name = strtolower(get_class($CI));
+
+    return array (
+        'price_list_id' => $price_list->id,
+        'name' => $price_list->name,
+        'description' => $price_list->description,
+        'edit' => anchor($controller_name."/view/$price_list->id", '<span class="glyphicon glyphicon-edit"></span>',
+            array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
+        ));
+}
+
 ?>
