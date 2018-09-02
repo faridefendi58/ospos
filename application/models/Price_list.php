@@ -128,42 +128,6 @@ class Price_list extends CI_Model
         return $del1;
     }
 
-    /*public function get_search_suggestions($search, $limit = 25)
-    {
-        $suggestions = array();
-
-        $this->db->from('price_lists');
-
-        //KIT #
-        if(stripos($search, 'KIT ') !== FALSE)
-        {
-            $this->db->like('price_list_id', str_ireplace('KIT ', '', $search));
-            $this->db->order_by('price_list_id', 'asc');
-
-            foreach($this->db->get()->result() as $row)
-            {
-                $suggestions[] = array('value' => 'KIT '. $row->price_list_id, 'label' => 'KIT ' . $row->price_list_id);
-            }
-        }
-        else
-        {
-            $this->db->like('name', $search);
-            $this->db->order_by('name', 'asc');
-
-            foreach($this->db->get()->result() as $row)
-            {
-                $suggestions[] = array('value' => $row->price_list_id, 'label' => $row->name);
-            }
-        }
-
-        //only return $limit suggestions
-        if(count($suggestions) > $limit) {
-            $suggestions = array_slice($suggestions, 0, $limit);
-        }
-
-        return $suggestions;
-    }*/
-
     /*
    Gets rows
    */
@@ -208,6 +172,59 @@ class Price_list extends CI_Model
         $this->db->order_by('code', 'asc');
 
         return $this->db->get()->result();
+    }
+
+    public function get_list_options() {
+        $this->db->from('price_lists');
+        $this->db->where('enabled', 1);
+        $this->db->order_by('code', 'asc');
+
+        $query = $this->db->get();
+
+        $items = [];
+        if($query->num_rows() == 0) {
+            return $items;
+        }
+
+        foreach ($query->result() as $result) {
+            $items[$result->id] = $result->code;
+        }
+
+        return $items;
+    }
+
+    public function get_default($just_id = false) {
+        $this->db->from('price_lists');
+        $this->db->where('is_default', 1);
+        $query = $this->db->get();
+
+        $row = $query->row();
+        if ($just_id) {
+            return $row->id;
+        }
+
+        return $row;
+    }
+
+    public function get_unit_price($price_list_id, $item_id) {
+        $this->db->select('t.unit_price, l.is_default');
+        $this->db->from('price_list_items as t');
+        $this->db->join('price_lists as l', 'l.id = t.price_list_id');
+        $this->db->where('price_list_id', $price_list_id);
+        $this->db->where('item_id', $item_id);
+
+        $query = $this->db->get();
+
+        if($query->num_rows() == 0) {
+            return 0;
+        }
+
+        $row = $query->row();
+        if ($row->is_default > 0) {
+            return 0;
+        }
+
+        return round($row->unit_price, 3);
     }
 }
 ?>

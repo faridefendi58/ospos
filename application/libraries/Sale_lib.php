@@ -15,6 +15,7 @@ class Sale_lib
 		$this->CI =& get_instance();
 		$this->CI->load->library('tax_lib');
 		$this->CI->load->model('enums/Rounding_mode');
+        $this->CI->load->model('Price_list');
 	}
 
 	public function get_line_sequence_options()
@@ -714,6 +715,11 @@ class Sale_lib
 		if($price_mode == PRICE_MODE_STANDARD)
 		{
 			$price = $item_info->unit_price;
+			// check on price list if any
+			$price_list_price = $this->CI->Price_list->get_unit_price($this->CI->session->userdata('price_list'), $item_id);
+			if ($price_list_price > 0) {
+				$price = $price_list_price;
+			}
 			$cost_price = $item_info->cost_price;
 		}
 		elseif($price_mode == PRICE_MODE_KIT)
@@ -1346,6 +1352,26 @@ class Sale_lib
 
 		return Rounding_mode::round_number($cash_rounding_code, $total, $cash_decimals);
 	}
+
+    public function get_price_list() {
+        if(!$this->CI->session->userdata('price_list'))
+        {
+        	$price_list_id = $this->Price_list->get_default(true);
+            $this->set_price_list($price_list_id);
+        }
+
+        return $this->CI->session->userdata('price_list');
+    }
+
+    public function set_price_list($price_list_id)
+    {
+        $this->CI->session->set_userdata('price_list', $price_list_id);
+    }
+
+    public function clear_price_list()
+    {
+        $this->CI->session->unset_userdata('price_list');
+    }
 }
 
 ?>
