@@ -38,6 +38,11 @@
 						'rows' => 3,
 						'value'=>$price_list_info->description)
 						);?>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="enabled" <?php if ($price_list_info->enabled) : ?>checked="checked"<?php endif; ?>> <?php echo $this->lang->line('price_lists_enabled'); ?>
+                    </label>
+                </div>
 			</div>
 		</div>
 

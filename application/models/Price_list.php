@@ -37,6 +37,7 @@ class Price_list extends CI_Model
 		name as name,
 		code,
 		description,
+		enabled,
 		created_at,
 		updated_at');
 
@@ -200,6 +201,13 @@ class Price_list extends CI_Model
         }
 
         return $this->db->get();
+    }
+
+    public function get_rows() {
+        $this->db->from('price_lists');
+        $this->db->order_by('code', 'asc');
+
+        return $this->db->get()->result();
     }
 }
 ?>

@@ -144,7 +144,11 @@
 
 	var do_delete = function (url, ids) {
 		if (confirm($.fn.bootstrapTable.defaults.formatConfirmDelete())) {
-			$.post((url || options.resource) + '/delete', {'ids[]': ids || selected_ids()}, function (response) {
+			rsc = (url || options.resource) + '/delete';
+			if (options.delete_resource) {
+                rsc = options.delete_resource;
+			}
+			$.post(rsc, {'ids[]': ids || selected_ids()}, function (response) {
 				//delete was successful, remove checkbox rows
 				if (response.success) {
 					var selector = ids ? row_selector(ids) : selected_rows();
@@ -216,9 +220,15 @@
 	var toggle_column_visibility = function() {
 		if (localStorage[options.employee_id]) {
 			var user_settings = JSON.parse(localStorage[options.employee_id]);
-			user_settings[options.resource] && $.each(user_settings[options.resource], function(index, element) {
-				element ? table().showColumn(index) : table().hideColumn(index);
-			});
+			if (options.custom_resource) {
+                user_settings[options.custom_resource] && $.each(user_settings[options.custom_resource], function(index, element) {
+                    element ? table().showColumn(index) : table().hideColumn(index);
+                });
+			} else {
+                user_settings[options.resource] && $.each(user_settings[options.resource], function(index, element) {
+                    element ? table().showColumn(index) : table().hideColumn(index);
+                });
+			}
 		}
 	};
 

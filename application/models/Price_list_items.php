@@ -11,7 +11,7 @@ class Price_list_items extends CI_Model
     */
     public function get_info($price_list_id)
     {
-        $this->db->select('t.id, t.price_list_id, v.name AS list_name, v.code, t.unit_price, u.name AS item_name');
+        $this->db->select('t.id, t.price_list_id, t.item_id AS item_id, v.name AS list_name, v.code, t.unit_price, u.name AS item_name');
         $this->db->from('price_list_items as t');
         $this->db->join('items as u', 'u.item_id = t.item_id');
         $this->db->join('price_lists as v', 'v.id = t.price_list_id');
@@ -37,32 +37,23 @@ class Price_list_items extends CI_Model
     }
 
     /*
-    Inserts or updates an item kit's items
+    Inserts or updates an price list items
     */
-    public function save(&$item_kit_items_data, $item_kit_id)
+    public function save(&$data, $id)
     {
-        $success = TRUE;
+        if(!$id || !$this->exists($id)) {
+            if($this->db->insert('price_list_items', $data)) {
+                $data['id'] = $this->db->insert_id();
 
-        //Run these queries as a transaction, we want to make sure we do all or nothing
-
-        $this->db->trans_start();
-
-        $this->delete($item_kit_id);
-
-        if($item_kit_items_data != NULL)
-        {
-            foreach($item_kit_items_data as $row)
-            {
-                $row['item_kit_id'] = $item_kit_id;
-                $success &= $this->db->insert('price_list_items', $row);
+                return TRUE;
             }
+
+            return FALSE;
         }
 
-        $this->db->trans_complete();
+        $this->db->where('id', $id);
 
-        $success &= $this->db->trans_status();
-
-        return $success;
+        return $this->db->update('price_list_items', $data);
     }
 
     /*
@@ -71,6 +62,14 @@ class Price_list_items extends CI_Model
     public function delete($price_list_id)
     {
         return $this->db->delete('price_list_items', array('price_list_id' => $price_list_id));
+    }
+
+    public function delete_list($ids)
+    {
+        $this->db->where_in('id', $ids);
+        $del1 = $this->db->delete('price_list_items');
+
+        return $del1;
     }
 
     public function exists($id) {
@@ -90,36 +89,59 @@ class Price_list_items extends CI_Model
         return $this->search($search, 0, 0, 'item_id', 'asc', TRUE);
     }
 
-    public function search($search, $rows = 0, $limit_from = 0, $sort = 'item_id', $order = 'asc', $count_only = FALSE)
-    {
+    public function search(
+        $search,
+        $rows = 0,
+        $limit_from = 0,
+        $sort = 'item_id',
+        $order = 'asc',
+        $count_only = false,
+        $price_list_id = 0) {
         // get_found_rows case
-        if($count_only == TRUE)
-        {
+        if($count_only == TRUE) {
             $this->db->select('COUNT(t.id) as count');
         } else {
-            $this->db->select('t.*, i.name AS item_name, l.code AS price_list_code, l.name AS price_list_name');
+            $this->db->select('t.*, t.item_id, i.name AS item_name, l.code AS price_list_code, l.name AS price_list_name');
         }
 
         $this->db->from('price_list_items AS t');
         $this->db->join('items as i', 'i.item_id = t.item_id');
         $this->db->join('price_lists as l', 'l.id = t.price_list_id');
-        $this->db->like('i.name', $search);
-        $this->db->or_like('i.description', $search);
+
+        if ($price_list_id > 0) {
+            $this->db->where('t.price_list_id', $price_list_id);
+        }
+
+        if (!empty($search)) {
+            $this->db->like('i.name', $search);
+            $this->db->or_like('i.description', $search);
+        }
 
         // get_found_rows case
-        if($count_only == TRUE)
-        {
+        if($count_only == TRUE) {
             return $this->db->get()->row()->count;
         }
 
         $this->db->order_by($sort, $order);
 
-        if($rows > 0)
-        {
+        if($rows > 0) {
             $this->db->limit($rows, $limit_from);
         }
 
         return $this->db->get();
+    }
+
+    public function find_all_by_price_list_id($price_list_id) {
+        $this->db->select('t.id, t.price_list_id, t.item_id AS item_id, v.name AS list_name, v.code, t.unit_price, u.name AS item_name');
+        $this->db->from('price_list_items as t');
+        $this->db->join('items as u', 'u.item_id = t.item_id');
+        $this->db->join('price_lists as v', 'v.id = t.price_list_id');
+        $this->db->where('t.price_list_id', $price_list_id);
+        $this->db->order_by('t.id', 'asc');
+
+        $query = $this->db->get();
+
+        return $query->result();
     }
 }
 ?>

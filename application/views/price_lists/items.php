@@ -5,7 +5,8 @@
             <?php $this->load->view('partial/bootstrap_tables_locale'); ?>
             table_support.init({
                 resource: '<?php echo site_url($controller_name);?>',
-                custom_resource: '<?php echo site_url($controller_name.'/search_items');?>',
+                custom_resource: '<?php echo site_url($controller_name.'/search_items/'.$price_list_id);?>',
+                delete_resource: '<?php echo site_url($controller_name.'/delete_items');?>',
                 headers: <?php echo $table_headers; ?>,
                 pageSize: <?php echo $this->config->item('lines_per_page'); ?>,
                 uniqueId: 'id'
@@ -15,9 +16,12 @@
     </script>
 
     <div id="title_bar" class="btn-toolbar">
-        <button class='btn btn-info btn-sm pull-right modal-dlg' data-btn-submit='<?php echo $this->lang->line('common_submit') ?>' data-href='<?php echo site_url($controller_name."/view"); ?>'
+        <button
+            class='btn btn-info btn-sm pull-right modal-dlg'
+            data-btn-submit='<?php echo $this->lang->line('common_submit') ?>'
+            data-href='<?php echo site_url($controller_name ."/view_list/". $price_list_id); ?>'
                 title='<?php echo $this->lang->line($controller_name. '_new'); ?>'>
-            <span class="glyphicon glyphicon-tags">&nbsp</span><?php echo $this->lang->line($controller_name. '_new'); ?>
+            <span class="glyphicon glyphicon-tags">&nbsp</span><?php echo $this->lang->line($controller_name. '_item_new'); ?>
         </button>
     </div>
 

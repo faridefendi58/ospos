@@ -112,6 +112,7 @@ class Price_lists extends Secure_Controller
 			'name' => $this->input->post('name'),
 			'code' => $this->input->post('code'),
 			'description' => $this->input->post('description'),
+			'enabled' => (empty($this->input->post('enabled')))? 0 : 1,
 			'updated_at' => date("Y-m-d H:i:s")
 		];
         if($id == -1) {
@@ -191,46 +192,103 @@ class Price_lists extends Secure_Controller
 		$this->load->view("barcodes/barcode_sheet", $data);
 	}
 
-    public function items()
+    public function items($id)
     {
         $data['table_headers'] = $this->xss_clean(get_price_list_items_table_headers());
+        $data['price_list_id'] = $id;
 
         $this->load->view('price_lists/items', $data);
     }
 
-    public function search_items()
-    {
+    public function search_items($id = 0) {
         $search = $this->input->get('search');
         $limit  = $this->input->get('limit');
         $offset = $this->input->get('offset');
         $sort   = $this->input->get('sort');
         $order  = $this->input->get('order');
 
-        $price_lists = $this->Price_list_items->search($search, $limit, $offset, $sort, $order);
+        $price_lists = $this->Price_list_items->search($search, $limit, $offset, $sort, $order, false, $id);
         $total_rows = $this->Price_list_items->get_found_rows($search);
 
         $data_rows = array();
-        foreach($price_lists->result() as $price_list) {
-            $data_rows[] = $this->xss_clean(get_price_list_items_data_row($price_list));
-        }
+        if (is_array($price_lists->result())) {
+            foreach($price_lists->result() as $price_list) {
+                $data_rows[] = $this->xss_clean(get_price_list_items_data_row($price_list));
+            }
+		}
 
         echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
     }
 
     public function view_list($id = -1) {
-        $info = $this->Price_list_items->get_info($id);
+        $info = $this->Price_list->get_info($id);
+        $item_id = $this->input->get('item_id');
 
         if($id == -1) {
             $info->price_list_id = 0;
         }
-        foreach(get_object_vars($info) as $property => $value)
-        {
+        foreach(get_object_vars($info) as $property => $value) {
             $info->$property = $this->xss_clean($value);
         }
 
         $data['price_list_info']  = $info;
+        $data['is_new_record'] = ($id == -1)? true : false;
+        $data['price_list_item_info'] = $this->Price_list_items->get_info($item_id);
+
+        $data['items'] = $this->Item->get_rows();
 
         $this->load->view("price_lists/form_items", $data);
+    }
+
+    public function save_item($id = -1) {
+        $data = [
+            'price_list_id' => $this->input->post('price_list_id'),
+            'item_id' => $this->input->post('item_id'),
+            'unit_price' => $this->input->post('unit_price'),
+            'updated_at' => date("Y-m-d H:i:s")
+        ];
+
+        $price_list_item_id = -1;
+        if (!empty($this->input->post('id'))) {
+            $price_list_item_id = $this->input->post('id');
+        } else {
+            $data['created_at'] = date("Y-m-d H:i:s");
+		}
+
+        if ($this->Price_list_items->save($data, $price_list_item_id)) {
+            $success = true;
+            $new_item = false;
+            //New item kit
+            if($price_list_item_id == -1) {
+                $new_item = true;
+            }
+
+            $item_kit_data = $this->xss_clean($data);
+
+            if($new_item) {
+                echo json_encode(array('success' => $success,
+                    'message' => $this->lang->line('price_lists_successful_adding'), 'id' => $id));
+            } else {
+                echo json_encode(array('success' => $success,
+                    'message' => $this->lang->line('price_lists_successful_updating'), 'id' => $id));
+            }
+        } else {
+            $item_kit_data = $this->xss_clean($data);
+
+            echo json_encode(array('success' => FALSE,
+                'message' => $this->lang->line('price_lists_error_adding_updating'), 'id' => -1));
+        }
+    }
+
+    public function delete_items() {
+        $ids = $this->xss_clean($this->input->post('ids'));
+        if($this->Price_list_items->delete_list($ids)) {
+            echo json_encode(array('success' => TRUE,
+                'message' => $this->lang->line('price_lists_successful_deleted').' '.$this->lang->line('price_lists_one_or_multiple')));
+        } else {
+            echo json_encode(array('success' => FALSE,
+                'message' => $this->lang->line('price_lists_cannot_be_deleted')));
+        }
     }
 }
 ?>

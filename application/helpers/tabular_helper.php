@@ -653,8 +653,9 @@ function get_price_list_manage_table_headers()
     $headers = array(
         array('price_list_id' => $CI->lang->line('price_lists_id')),
         array('code' => $CI->lang->line('price_lists_code')),
-        array('name' => $CI->lang->line('price_lists_name')),
+        array('item_name' => $CI->lang->line('price_lists_name')),
         array('description' => $CI->lang->line('price_lists_description')),
+        array('status' => $CI->lang->line('price_lists_status')),
         array('created_at' => $CI->lang->line('price_lists_created_at'))
     );
 
@@ -674,9 +675,10 @@ function get_price_list_data_row($price_list)
 
     return [
         'price_list_id' => $price_list->id,
-        'name' => $price_list->name,
+        'item_name' => $price_list->name,
         'code' => $price_list->code,
         'description' => $price_list->description,
+        'status' => ($price_list->enabled)? $CI->lang->line('price_lists_status_enabled') : $CI->lang->line('price_lists_status_disabled'),
         'created_at' => date("d/m/Y H:i", strtotime($price_list->created_at)),
         'edit' => anchor(
         	$controller_name."/view/$price_list->id",
@@ -719,10 +721,10 @@ function get_price_list_items_data_row($item) {
         'id' => $item->id,
         'code' => $item->price_list_code,
         'item_name' => $item->item_name,
-        'unit_price' => $item->unit_price,
+        'unit_price' => number_format($item->unit_price, 0, ',', '.'),
         'created_at' => date("d/m/Y H:i", strtotime($item->created_at)),
         'edit' => anchor(
-            $controller_name ."/view_list/". $item->id,
+            $controller_name ."/view_list/". $item->price_list_id ."?item_id=". $item->id,
             '<span class="glyphicon glyphicon-edit"></span>',
             array(
                 'class' => 'modal-dlg',
