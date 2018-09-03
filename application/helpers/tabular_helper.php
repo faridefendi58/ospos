@@ -733,4 +733,41 @@ function get_price_list_items_data_row($item) {
             )
         )];
 }
+
+function get_item_expiration_date_manage_table_headers()
+{
+    $CI =& get_instance();
+
+    $headers = array(
+        array('id' => $CI->lang->line('item_expiration_dates_id')),
+        array('item_name' => $CI->lang->line('item_expiration_dates_item_name')),
+        array('quantity' => $CI->lang->line('item_expiration_dates_quantity')),
+        array('expired_at' => $CI->lang->line('item_expiration_dates_expired_at')),
+        array('created_at' => $CI->lang->line('item_expiration_dates_created_at'))
+    );
+
+    return transform_headers($headers);
+}
+
+function get_item_expiration_date_data_row($item)
+{
+    $CI =& get_instance();
+    $controller_name = strtolower(get_class($CI));
+
+    return [
+        'id' => $item->id,
+        'item_name' => $item->item_name,
+        'quantity' => $item->quantity,
+        'expired_at' => date("d/m/Y", strtotime($item->expired_at)),
+        'created_at' => date("d/m/Y H:i", strtotime($item->created_at)),
+        'edit' => anchor(
+            $controller_name ."/view/". $item->id,
+            '<span class="glyphicon glyphicon-edit"></span>',
+            array(
+                'class' => 'modal-dlg',
+                'data-btn-submit' => $CI->lang->line('common_submit'),
+                'title' => $CI->lang->line($controller_name.'_update')
+            )
+        )];
+}
 ?>
