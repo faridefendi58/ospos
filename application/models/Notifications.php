@@ -4,14 +4,14 @@
  * Item_expiration_date class
  */
 
-class Item_expiration_date extends CI_Model
+class Notifications extends CI_Model
 {
     /*
     Determines if a given item_id is an item kit
     */
     public function exists($id)
     {
-        $this->db->from('item_expiration_dates');
+        $this->db->from('notifications');
         $this->db->where('id', $id);
 
         return ($this->db->get()->num_rows() == 1);
@@ -22,7 +22,7 @@ class Item_expiration_date extends CI_Model
     */
     public function get_total_rows()
     {
-        $this->db->from('item_expiration_dates');
+        $this->db->from('notifications');
 
         return $this->db->count_all_results();
     }
@@ -34,7 +34,7 @@ class Item_expiration_date extends CI_Model
     {
         $this->db->select('t.*');
 
-        $this->db->from('item_expiration_dates AS t');
+        $this->db->from('notifications AS t');
         $this->db->where('t.id', $id);
 
         $query = $this->db->get();
@@ -46,7 +46,7 @@ class Item_expiration_date extends CI_Model
             $item_obj = new stdClass();
 
             //Get all the fields from items table
-            foreach($this->db->list_fields('item_expiration_dates') as $field)
+            foreach($this->db->list_fields('notifications') as $field)
             {
                 $item_obj->$field = '';
             }
@@ -60,8 +60,8 @@ class Item_expiration_date extends CI_Model
     */
     public function get_multiple_info($item_id)
     {
-        $this->db->from('item_expiration_dates');
-        $this->db->where_in('item_id', $item_id);
+        $this->db->from('notifications');
+        $this->db->where_in('rel_id', $item_id);
         $this->db->order_by('name', 'asc');
 
         return $this->db->get();
@@ -74,7 +74,7 @@ class Item_expiration_date extends CI_Model
     {
         if(!$id || !$this->exists($id))
         {
-            if($this->db->insert('item_expiration_dates', $data))
+            if($this->db->insert('notifications', $data))
             {
                 $insert = $this->db->insert_id();
 
@@ -86,7 +86,7 @@ class Item_expiration_date extends CI_Model
 
         $this->db->where('id', $id);
 
-        return $this->db->update('item_expiration_dates', $data);
+        return $this->db->update('notifications', $data);
     }
 
     /*
@@ -97,7 +97,7 @@ class Item_expiration_date extends CI_Model
             return false;
         }
 
-        return $this->db->delete('item_expiration_dates', array('id' => $id));
+        return $this->db->delete('notifications', array('id' => $id));
     }
 
     /*
@@ -106,7 +106,7 @@ class Item_expiration_date extends CI_Model
     public function delete_list($ids)
     {
         $this->db->where_in('id', $ids);
-        return $this->db->delete('item_expiration_dates');
+        return $this->db->delete('notifications');
     }
 
     /*
@@ -114,13 +114,13 @@ class Item_expiration_date extends CI_Model
    */
     public function get_found_rows($search)
     {
-        return $this->search($search, 0, 0, 'item_id', 'asc', TRUE);
+        return $this->search($search, 0, 0, 'id', 'asc', TRUE);
     }
 
     /*
     Perform a search on items
     */
-    public function search($search, $rows = 0, $limit_from = 0, $sort = 'item_id', $order = 'asc', $count_only = FALSE)
+    public function search($search, $rows = 0, $limit_from = 0, $sort = 'id', $order = 'asc', $count_only = FALSE)
     {
         // get_found_rows case
         if($count_only == TRUE) {
@@ -129,9 +129,9 @@ class Item_expiration_date extends CI_Model
             $this->db->select('t.*, i.name AS item_name');
         }
 
-        $this->db->from('item_expiration_dates AS t');
-        $this->db->join('items as i', 'i.item_id = t.item_id');
-        $this->db->where('t.enabled', 1);
+        $this->db->from('notifications AS t');
+        $this->db->join('item_expiration_dates as exp', 'exp.id = t.exp_date_id');
+        $this->db->where('t.person_id', $this->session->userdata('person_id'));
 
         // get_found_rows case
         if($count_only == TRUE)
@@ -150,29 +150,26 @@ class Item_expiration_date extends CI_Model
     }
 
     public function get_rows() {
-        $this->db->from('item_expiration_dates');
+        $this->db->from('notifications');
         $this->db->order_by('id', 'asc');
 
         return $this->db->get()->result();
     }
 
-    public function get_expired_soon($limit = 10) {
-        $max = $this->config->item("notif_max_day_before_expired");
-        if (empty($max)) {
+    public function get_noticed_id($exp_date_id = 0, $item_id = 0) {
+        $limit = $this->config->item("notif_max_day_before_expired");
+        if (empty($limit)) {
             return array();
         }
-        $this->db->select('t.*, DATEDIFF(t.expired_at, NOW()) AS diff, i.name AS item_name, n.noticed_at AS noticed_at');
-        $this->db->from('item_expiration_dates AS t');
-        $this->db->join('items as i', 'i.item_id = t.item_id');
-        $this->db->join('notifications as n', 'n.exp_date_id = t.id AND n.person_id = '.$this->session->userdata('person_id'), 'left');
-        $this->db->where('t.enabled', 1);
-        $this->db->where('n.noticed_at ', null);
-        $this->db->having('diff <= ', $max);
-        $this->db->having('diff >= ', 0);
-        $this->db->order_by('t.expired_at', 'asc');
-        $this->db->limit($limit);
+        $this->db->select('t.id');
+        $this->db->from('notifications AS t');
+        $this->db->where('t.person_id', $this->session->userdata('person_id'));
+        $this->db->where('t.exp_date_id', $exp_date_id);
+        $this->db->where('t.item_id', $item_id);
 
-        return $this->db->get()->result();
+        $row = $this->db->get()->row();
+
+        return (is_object($row))? $row->id : 0;
     }
 }
 ?>

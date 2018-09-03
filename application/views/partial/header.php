@@ -110,10 +110,6 @@
 			</div>
 		</div>
 
-        <?php if ($this->config->item("notification_enable")): ?>
-            <?php $this->load->view("partial/notification"); ?>
-        <?php endif; ?>
-
 		<div class="navbar navbar-default" role="navigation">
 			<div class="container">
 				<div class="navbar-header">
@@ -143,5 +139,8 @@
 		</div>
 
 		<div class="container">
+            <?php if ($this->config->item("notification_enable")): ?>
+                <?php $this->load->view("partial/notification"); ?>
+            <?php endif; ?>
 			<div class="row">
 	 

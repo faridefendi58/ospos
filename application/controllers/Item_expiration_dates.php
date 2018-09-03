@@ -8,6 +8,7 @@ class Item_expiration_dates extends Secure_Controller
     {
         parent::__construct('item_expiration_dates');
         $this->load->model('Item_expiration_date');
+        $this->load->model('Notifications');
     }
 
     public function index()
@@ -110,7 +111,27 @@ class Item_expiration_dates extends Secure_Controller
     }
 
     public function warning() {
-        echo json_encode(array('success' => 1, 'message' => 'ada 10 produk yang expired!'));
+        $exps = $this->Item_expiration_date->get_expired_soon();
+        $messages = [];
+        if (is_array($exps) && count($exps) > 0) {
+            foreach ($exps as $i => $exp) {
+                $msg = [
+                    'id' => $exp->id,
+                    'msg' => $exp->quantity.' '.$exp->item_name.' akan expired pada '. date("d/m/Y", strtotime($exp->expired_at)),
+                    'href' => 'item_expiration_dates?id='.$exp->id
+                ];
+                array_push($messages, $msg);
+                $data = [
+                    'exp_date_id' => $exp->id,
+                    'item_id' => 0,
+                    'noticed_at' => date("Y-m-d H:i:s"),
+                    'person_id' => $this->session->userdata('person_id')
+                ];
+                $this->Notifications->save($data, -1);
+            }
+        }
+
+        echo json_encode(array('success' => 1, 'messages' => $messages));
     }
 }
 ?>
