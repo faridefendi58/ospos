@@ -35,3 +35,5 @@ $lang["module_suppliers"] = "Pemasok";
 $lang["module_suppliers_desc"] = "Tambah, Rubah, Hapus, dan Cari Pemasok";
 $lang["module_taxes"] = "Pajak";
 $lang["module_taxes_desc"] = "";
+$lang["module_price_lists"] = "Daftar Harga";
+$lang["module_price_lists_desc"] = "Tambah, Rubah, Hapus dan Cari Daftar Harga";

@@ -1042,5 +1042,13 @@ class Item extends CI_Model
 		}
 		return $item_name;
 	}
+
+    public function get_rows() {
+        $this->db->from('items');
+        $this->db->where('deleted', 0);
+        $this->db->order_by('name', 'asc');
+
+        return $this->db->get()->result();
+    }
 }
 ?>

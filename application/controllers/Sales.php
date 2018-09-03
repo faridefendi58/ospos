@@ -15,6 +15,7 @@ class Sales extends Secure_Controller
 		$this->load->library('barcode_lib');
 		$this->load->library('email_lib');
 		$this->load->library('token_lib');
+        $this->load->model('Price_list');
 	}
 
 	public function index()
@@ -185,6 +186,9 @@ class Sales extends Secure_Controller
 		{
 			$this->sale_lib->set_sale_location($stock_location);
 		}
+
+        $price_list = $this->input->post('price_list');
+        $this->sale_lib->set_price_list($price_list);
 
 		$this->_reload();
 	}
@@ -387,6 +391,7 @@ class Sales extends Secure_Controller
 		}
 
 		$item_id_or_number_or_item_kit_or_receipt = $this->input->post('item');
+        $quantity = 0;
 		$this->barcode_lib->parse_barcode_fields($quantity, $item_id_or_number_or_item_kit_or_receipt);
 		$mode = $this->sale_lib->get_mode();
 		$quantity = ($mode == 'return') ? -$quantity : $quantity;
@@ -1085,6 +1090,9 @@ class Sales extends Secure_Controller
 			$data['mode_label'] = $this->lang->line('sales_receipt');
 			$data['customer_required'] = $this->lang->line('sales_customer_optional');
 		}
+
+		$data['price_lists'] = $this->Price_list->get_list_options();
+		$data['price_list_default'] = $this->sale_lib->get_price_list();
 
 		$data = $this->xss_clean($data);
 

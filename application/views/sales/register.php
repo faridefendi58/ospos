@@ -30,6 +30,9 @@ if(isset($success))
 				<li class="pull-left">
 					<?php echo form_dropdown('mode', $modes, $mode, array('onchange'=>"$('#mode_form').submit();", 'class'=>'selectpicker show-menu-arrow', 'data-style'=>'btn-default btn-sm', 'data-width'=>'fit')); ?>
 				</li>
+                <li class="pull-left">
+                    <?php echo form_dropdown('price_list', $price_lists, $price_list_default, array('onchange'=>"$('#mode_form').submit();", 'class'=>'selectpicker show-menu-arrow', 'data-style'=>'btn-default btn-sm', 'data-width'=>'fit')); ?>
+                </li>
 				<?php
 				if($this->config->item('dinner_table_enable') == TRUE)
 				{
