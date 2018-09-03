@@ -215,16 +215,36 @@ class Price_list extends CI_Model
 
         $query = $this->db->get();
 
-        if($query->num_rows() == 0) {
-            return 0;
-        }
-
         $row = $query->row();
-        if ($row->is_default > 0) {
-            return 0;
+
+        $unit_price = 0;
+        if (is_object($row)) {
+            $unit_price = $row->unit_price;
         }
 
-        return round($row->unit_price, 3);
+        if($query->num_rows() == 0) {
+            $unit_price = 0;
+        }
+
+        if (is_object($row)
+            && property_exists($row, 'is_default')
+            && $row->is_default > 0) {
+            $unit_price = 0;
+        }
+
+        // check one again on item master
+        if ($unit_price == 0) {
+            $this->db->select('t.unit_price');
+            $this->db->from('items as t');
+            $this->db->where('item_id', $item_id);
+
+            $query = $this->db->get();
+
+            $row = $query->row();
+            $unit_price = $row->unit_price;
+        }
+
+        return round($unit_price, 3);
     }
 }
 ?>

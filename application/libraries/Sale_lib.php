@@ -1356,7 +1356,7 @@ class Sale_lib
     public function get_price_list() {
         if(!$this->CI->session->userdata('price_list'))
         {
-        	$price_list_id = $this->Price_list->get_default(true);
+        	$price_list_id = $this->CI->Price_list->get_default(true);
             $this->set_price_list($price_list_id);
         }
 
@@ -1366,6 +1366,21 @@ class Sale_lib
     public function set_price_list($price_list_id)
     {
         $this->CI->session->set_userdata('price_list', $price_list_id);
+        // Get all items in the cart so far...
+        $items = $this->get_cart();
+        if (is_array($items) && count($items) > 0) {
+            foreach($items as &$item) {
+                // check on price list if any
+                $price_list_price = $this->CI->Price_list->get_unit_price($price_list_id, $item['item_id']);
+                if ($price_list_price > 0) {
+                    $item['price'] = $price_list_price;
+                    $item['total'] = $this->get_item_total($item['quantity'], $item['price'], $item['discount']);
+                    $item['discounted_total'] = $this->get_item_total($item['quantity'], $item['price'], $item['discount'], TRUE);
+                }
+            }
+
+            $this->set_cart($items);
+		}
     }
 
     public function clear_price_list()
