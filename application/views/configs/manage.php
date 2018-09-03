@@ -44,6 +44,9 @@
 	<li role="presentation">
 		<a data-toggle="tab" href="#mailchimp_tab" title="<?php echo $this->lang->line('config_mailchimp_configuration'); ?>"><?php echo $this->lang->line('config_mailchimp'); ?></a>
 	</li>
+    <li role="presentation">
+        <a data-toggle="tab" href="#notification_tab" title="<?php echo $this->lang->line('config_notification_configuration'); ?>"><?php echo $this->lang->line('config_notification'); ?></a>
+    </li>
 	<li role="presentation">
 		<a data-toggle="tab" href="#license_tab" title="<?php echo $this->lang->line('config_license_configuration'); ?>"><?php echo $this->lang->line('config_license'); ?></a>
 	</li>
@@ -89,6 +92,9 @@
 	<div class="tab-pane" id="mailchimp_tab">
 		<?php $this->load->view("configs/mailchimp_config"); ?>
 	</div>
+    <div class="tab-pane" id="notification_tab">
+        <?php $this->load->view("configs/notification_config"); ?>
+    </div>
 	<div class="tab-pane" id="license_tab">
 		<?php $this->load->view("configs/license_config"); ?>
 	</div>

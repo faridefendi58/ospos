@@ -108,5 +108,9 @@ class Item_expiration_dates extends Secure_Controller
                 'message' => $this->lang->line('item_expiration_dates_cannot_be_deleted')));
         }
     }
+
+    public function warning() {
+        echo json_encode(array('success' => 1, 'message' => 'ada 10 produk yang expired!'));
+    }
 }
 ?>
