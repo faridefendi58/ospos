@@ -119,7 +119,7 @@ class Item_expiration_dates extends Secure_Controller
                 $msg = [
                     'id' => $exp->notification_id,
                     'msg' => $exp->quantity.' '.$exp->item_name.' akan expired pada '. date("d/m/Y", strtotime($exp->expired_at)),
-                    'href' => 'item_expiration_dates?id='.$exp->id,
+                    'href' => 'item_expiration_dates/detail/'.$exp->id,
                     'class_name' => 'alert-warning'
                 ];
                 array_push($messages, $msg);
@@ -139,7 +139,7 @@ class Item_expiration_dates extends Secure_Controller
                 $msg = [
                     'id' => $out_of_stock->notification_id,
                     'msg' => 'Stok '.$out_of_stock->item_name.' hanya tersedia '. (int)$out_of_stock->quantity,
-                    'href' => '#'.$out_of_stock->item_id,
+                    'href' => 'items',
                     'class_name' => 'alert-info'
                 ];
                 array_push($messages, $msg);
@@ -169,6 +169,15 @@ class Item_expiration_dates extends Secure_Controller
         $this->Notifications->save($data, (int)$id);
 
         echo json_encode(array('success' => 1));
+    }
+
+    public function detail($item_expiration_date_id = -1)
+    {
+        $info = $this->Item_expiration_date->get_info($item_expiration_date_id);
+
+        $data['info']  = $info;
+
+        $this->load->view("item_expiration_dates/detail", $data);
     }
 }
 ?>

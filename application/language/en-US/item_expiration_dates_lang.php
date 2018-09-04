@@ -19,3 +19,4 @@ $lang['item_expiration_dates_successful_updating'] = "Your data has been success
 $lang['item_expiration_dates_confirm_delete'] = "Are you sure you want to delete the selected Item?";
 $lang["item_expiration_dates_cannot_be_deleted"] = "Item(s) delete failed.";
 $lang["item_expiration_dates_successful_deleted"] = "You have successfully deleted";
+$lang["item_expiration_dates_detail"] = "Detail Item Expiration Date";

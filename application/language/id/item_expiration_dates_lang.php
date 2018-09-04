@@ -19,3 +19,4 @@ $lang['item_expiration_dates_successful_updating'] = "Data telah berhasil diubah
 $lang['item_expiration_dates_confirm_delete'] = "Anda yakin ingin menghapus item yang terpilih?";
 $lang["item_expiration_dates_cannot_be_deleted"] = "Gagal menghapus data terpilih.";
 $lang["item_expiration_dates_successful_deleted"] = "Data telah berhasil dihapus";
+$lang["item_expiration_dates_detail"] = "Rincian Tanggal Kadaluarsa Produk";

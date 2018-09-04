@@ -32,9 +32,10 @@ class Item_expiration_date extends CI_Model
     */
     public function get_info($id)
     {
-        $this->db->select('t.*');
+        $this->db->select('t.*, i.name AS item_name');
 
         $this->db->from('item_expiration_dates AS t');
+        $this->db->join('items as i', 'i.item_id = t.item_id');
         $this->db->where('t.id', $id);
 
         $query = $this->db->get();

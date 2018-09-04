@@ -51,7 +51,8 @@
     function dismising() {
         $('a[id="text-message"]').click(function () {
             $(this).parent().find("button").trigger("click");
-            return false;
+            window.location.href = $(this).attr('href');
+            //return false;
         });
         $('#notif-alert-group').find('button.close').click(function () {
             var id = $(this).attr('id');
