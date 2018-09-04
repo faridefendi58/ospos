@@ -177,5 +177,44 @@ class Item_expiration_date extends CI_Model
 
         return $this->db->get()->result();
     }
+
+    public function get_quantity_by_item($item_id) {
+        $this->db->select('t.id, t.quantity');
+
+        $this->db->from('item_expiration_dates AS t');
+        $this->db->where('t.item_id', $item_id);
+        $this->db->where('t.quantity >', 0);
+
+        $query = $this->db->get();
+        $row = $query->row();
+
+        return $row;
+    }
+
+    public function update_lot_qty($item_id, $qty) {
+        $item = $this->get_quantity_by_item($item_id);
+        if (!is_object($item)) {
+            return false;
+        }
+        $current_qty = $item->quantity;
+        if ($current_qty > 0) {
+            $new_qty = $current_qty - $qty;
+            if ($new_qty < 0) {
+                $new_qty = 0;
+            }
+            $this->db->where('id', $item->id);
+            $data = [
+                'quantity' => $new_qty,
+                'updated_at' => date("Y-m-d H:i:s")
+                ];
+            if ($new_qty == 0) {
+                $data['enabled'] = 0;
+            }
+
+            return $this->db->update('item_expiration_dates', $data);
+        }
+
+        return false;
+    }
 }
 ?>

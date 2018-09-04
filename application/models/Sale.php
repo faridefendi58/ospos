@@ -565,6 +565,8 @@ class Sale extends CI_Model
 	 */
 	public function save($sale_id, &$sale_status, &$items, $customer_id, $employee_id, $comment, $invoice_number, $work_order_number, $quote_number, $sale_type, $payments, $dinner_table, &$sales_taxes)
 	{
+        $this->load->model('Item_expiration_date');
+
 		if($sale_id != -1)
 		{
 			$this->clear_suspended_sale_detail($sale_id);
@@ -687,6 +689,16 @@ class Sale extends CI_Model
 					'trans_inventory'	=> -$item['quantity']
 				);
 				$this->Inventory->insert($inv_data);
+
+				// substract stock lot if any
+				try {
+                    $this->Item_expiration_date->update_lot_qty($item['item_id'], $item['quantity']);
+				} catch (Exception $e) {
+					var_dump($e->getMessage());
+				}
+
+				$lot_data = [
+					'quantity' => $item['quantity']];
 			}
 
 			// Calculate taxes and save the tax information for the sale.  Return the result for printing
