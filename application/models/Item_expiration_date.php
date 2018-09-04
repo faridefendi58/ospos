@@ -161,12 +161,15 @@ class Item_expiration_date extends CI_Model
         if (empty($max)) {
             return array();
         }
-        $this->db->select('t.*, DATEDIFF(t.expired_at, NOW()) AS diff, i.name AS item_name, n.noticed_at AS noticed_at');
+        $this->db->select('t.*, DATEDIFF(t.expired_at, NOW()) AS diff, i.name AS item_name, n.noticed_at AS noticed_at, n.id AS notification_id');
         $this->db->from('item_expiration_dates AS t');
         $this->db->join('items as i', 'i.item_id = t.item_id');
         $this->db->join('notifications as n', 'n.exp_date_id = t.id AND n.person_id = '.$this->session->userdata('person_id'), 'left');
         $this->db->where('t.enabled', 1);
+        $this->db->group_start();
         $this->db->where('n.noticed_at ', null);
+        $this->db->or_where('n.is_closed ', 0);
+        $this->db->group_end();
         $this->db->having('diff <= ', $max);
         $this->db->having('diff >= ', 0);
         $this->db->order_by('t.expired_at', 'asc');

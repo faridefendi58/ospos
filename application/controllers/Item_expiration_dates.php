@@ -9,6 +9,7 @@ class Item_expiration_dates extends Secure_Controller
         parent::__construct('item_expiration_dates');
         $this->load->model('Item_expiration_date');
         $this->load->model('Notifications');
+        $this->load->model('Item_quantity');
     }
 
     public function index()
@@ -116,9 +117,10 @@ class Item_expiration_dates extends Secure_Controller
         if (is_array($exps) && count($exps) > 0) {
             foreach ($exps as $i => $exp) {
                 $msg = [
-                    'id' => $exp->id,
+                    'id' => $exp->notification_id,
                     'msg' => $exp->quantity.' '.$exp->item_name.' akan expired pada '. date("d/m/Y", strtotime($exp->expired_at)),
-                    'href' => 'item_expiration_dates?id='.$exp->id
+                    'href' => 'item_expiration_dates?id='.$exp->id,
+                    'class_name' => 'alert-warning'
                 ];
                 array_push($messages, $msg);
                 $data = [
@@ -127,11 +129,46 @@ class Item_expiration_dates extends Secure_Controller
                     'noticed_at' => date("Y-m-d H:i:s"),
                     'person_id' => $this->session->userdata('person_id')
                 ];
-                $this->Notifications->save($data, -1);
+                if ($this->Notifications->get_noticed_id($exp->id, 0) == 0)
+                    $this->Notifications->save($data, -1);
+            }
+        }
+        $out_of_stocks = $this->Item_quantity->get_out_of_stock_soon();
+        if (is_array($out_of_stocks) && count($out_of_stocks) > 0) {
+            foreach ($out_of_stocks as $i => $out_of_stock) {
+                $msg = [
+                    'id' => $out_of_stock->notification_id,
+                    'msg' => 'Stok '.$out_of_stock->item_name.' hanya tersedia '. (int)$out_of_stock->quantity,
+                    'href' => '#'.$out_of_stock->item_id,
+                    'class_name' => 'alert-info'
+                ];
+                array_push($messages, $msg);
+                $data = [
+                    'exp_date_id' => 0,
+                    'item_id' => $out_of_stock->item_id,
+                    'noticed_at' => date("Y-m-d H:i:s"),
+                    'person_id' => $this->session->userdata('person_id')
+                ];
+                if ($this->Notifications->get_noticed_id(0, $out_of_stock->item_id) == 0)
+                    $this->Notifications->save($data, -1);
             }
         }
 
         echo json_encode(array('success' => 1, 'messages' => $messages));
+    }
+
+    public function close_notification($id) {
+        if ($this->input->post("id") != $id) {
+            echo json_encode(array('success' => 0));
+        }
+
+        $data = [
+            'is_closed' => 1,
+        ];
+
+        $this->Notifications->save($data, (int)$id);
+
+        echo json_encode(array('success' => 1));
     }
 }
 ?>

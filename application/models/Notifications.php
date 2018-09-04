@@ -157,15 +157,13 @@ class Notifications extends CI_Model
     }
 
     public function get_noticed_id($exp_date_id = 0, $item_id = 0) {
-        $limit = $this->config->item("notif_max_day_before_expired");
-        if (empty($limit)) {
-            return array();
-        }
         $this->db->select('t.id');
         $this->db->from('notifications AS t');
         $this->db->where('t.person_id', $this->session->userdata('person_id'));
-        $this->db->where('t.exp_date_id', $exp_date_id);
-        $this->db->where('t.item_id', $item_id);
+        if ($exp_date_id > 0)
+            $this->db->where('t.exp_date_id', $exp_date_id);
+        if ($item_id > 0)
+            $this->db->where('t.item_id', $item_id);
 
         $row = $this->db->get()->row();
 
