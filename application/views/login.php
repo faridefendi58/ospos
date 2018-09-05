@@ -23,7 +23,11 @@
     </div>
 
 	<div id="login">
-		<?php echo form_open('login') ?>
+        <?php $action = 'login'; ?>
+        <?php if (!empty($r)) :?>
+            <?php $action .= '?r='.$r; ?>
+        <?php endif; ?>
+		<?php echo form_open($action) ?>
 			<div id="container">
 				<div align="center" style="color:red"><?php echo validation_errors(); ?></div>
 

@@ -16,6 +16,12 @@
     </script>
 
     <div id="title_bar" class="btn-toolbar">
+        <button class='btn btn-info btn-sm pull-right modal-dlg' data-btn-submit='<?php echo $this->lang->line('common_submit') ?>'
+                data-href='<?php echo site_url($controller_name."/excel_import/".$price_list_id); ?>'
+                title='<?php echo $this->lang->line('items_import_items_excel'); ?>'>
+            <span class="glyphicon glyphicon-import">&nbsp</span><?php echo $this->lang->line('common_import_excel'); ?>
+        </button>
+
         <button
             class='btn btn-info btn-sm pull-right modal-dlg'
             data-btn-submit='<?php echo $this->lang->line('common_submit') ?>'

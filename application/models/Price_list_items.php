@@ -143,5 +143,14 @@ class Price_list_items extends CI_Model
 
         return $query->result();
     }
+
+    public function find_one_by($price_list_id, $item_id) {
+        $this->db->select('t.id');
+        $this->db->from('price_list_items as t');
+        $query = $this->db->get();
+
+        $row = $query->row();
+        return $row;
+    }
 }
 ?>

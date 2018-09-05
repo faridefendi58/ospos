@@ -290,5 +290,112 @@ class Price_lists extends Secure_Controller
                 'message' => $this->lang->line('price_lists_cannot_be_deleted')));
         }
     }
+
+    public function excel()
+    {
+        $name = 'price_list_template.csv';
+        $data = file_get_contents('../' . $name);
+        force_download($name, $data);
+    }
+
+    public function excel_import($price_list_id)
+    {
+        $this->load->view('price_lists/form_excel_import', ['price_list_id' => $price_list_id]);
+    }
+
+    public function do_excel_import($price_list_id)
+    {
+        if($_FILES['file_path']['error'] != UPLOAD_ERR_OK)
+        {
+            echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('items_excel_import_failed')));
+        }
+        else
+        {
+            if(($handle = fopen($_FILES['file_path']['tmp_name'], 'r')) !== FALSE)
+            {
+                // Skip the first row as it's the table description
+                fgetcsv($handle);
+                $i = 1;
+
+                $failCodes = array();
+
+                while(($data = fgetcsv($handle)) !== FALSE)
+                {
+                    // XSS file data sanity check
+                    $data = $this->xss_clean($data);
+
+                    /* haven't touched this so old templates will work, or so I guess... */
+                    if(sizeof($data) >= 3)
+                    {
+                        $item_data = array(
+                            'name' => $data[1],
+                            'unit_price' => $data[2]
+                        );
+
+                        $item_number = $data[0];
+                        $invalidated = FALSE;
+                        if($item_number != '')
+                        {
+                            $item_data['item_number'] = $item_number;
+                            $invalidated = $this->Item->item_number_exists($item_number);
+                        }
+                    }
+                    else
+                    {
+                        $invalidated = TRUE;
+                    }
+
+
+                    if($invalidated)
+                    {
+                        $item_info = $this->Item->get_info_by_id_or_number($item_data['item_number']);
+                        if (is_object($item_info)) {
+                            $item_data['item_id'] = $item_info->item_id;
+						}
+
+                        $params = [
+                            'price_list_id' => $price_list_id,
+                            'item_id' => $item_data['item_id'],
+                            'unit_price' => $item_data['unit_price'],
+                            'updated_at' => date("Y-m-d H:i:s")
+                        ];
+
+                        $pl_item = $this->Price_list_items->find_one_by($price_list_id, $item_data['item_id']);
+                        $price_list_item_id = -1;
+                        if (is_object($pl_item)) {
+                            $price_list_item_id = $pl_item->id;
+						} else {
+                            $params['created_at'] = date("Y-m-d H:i:s");
+                        }
+
+                        if ($this->Price_list_items->save($params, $price_list_item_id)) {
+                            $success = true;
+                        }
+                    }
+                    else //insert or update item failure
+                    {
+                        $failCodes[] = $i;
+                    }
+
+                    ++$i;
+                }
+
+                if(count($failCodes) > 0)
+                {
+                    $message = $this->lang->line('items_excel_import_partially_failed') . ' (' . count($failCodes) . '): ' . implode(', ', $failCodes);
+
+                    echo json_encode(array('success' => FALSE, 'message' => $message));
+                }
+                else
+                {
+                    echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('items_excel_import_success')));
+                }
+            }
+            else
+            {
+                echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('items_excel_import_nodata_wrongformat')));
+            }
+        }
+    }
 }
 ?>

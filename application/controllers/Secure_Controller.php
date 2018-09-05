@@ -15,7 +15,10 @@ class Secure_Controller extends CI_Controller
 
 		if(!$model->is_logged_in())
 		{
-			redirect('login');
+			if (!empty($this->build_current_path()))
+				redirect('login?r='.$this->build_current_path());
+			else
+				redirect('login');
 		}
 
 		$logged_in_employee_info = $model->get_logged_in_employee_info();
@@ -99,5 +102,13 @@ class Secure_Controller extends CI_Controller
 	public function view($data_item_id = -1) { return FALSE; }
 	public function save($data_item_id = -1) { return FALSE; }
 	public function delete() { return FALSE; }
+
+	private function build_current_path() {
+        $ctrl = $this->uri->segment(1);
+        $full_uri = $_SERVER['REQUEST_URI'];
+        $full_segment = substr($full_uri, strpos($full_uri, $ctrl));
+
+        return (!empty($full_segment))? $full_segment : null;
+	}
 }
 ?>
