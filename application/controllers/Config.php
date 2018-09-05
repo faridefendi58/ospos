@@ -982,5 +982,21 @@ class Config extends Secure_Controller
 			redirect('no_access/config');
 		}
 	}
+
+    public function save_notification() {
+        $batch_save_data = array(
+            'notification_enable' => (!empty($this->input->post('notification_enable')))? 1 : 0,
+            'notif_max_day_before_expired' => (int)$this->input->post('notif_max_day_before_expired'),
+            'notif_limit_quantity' => (int)$this->input->post('notif_limit_quantity'),
+        );
+
+        $result = $this->Appconfig->batch_save($batch_save_data);
+        $success = $result ? TRUE : FALSE;
+
+        echo json_encode(array(
+            'success' => $success,
+            'message' => $this->lang->line('config_saved_' . ($success ? '' : 'un') . 'successfully')
+        ));
+    }
 }
 ?>

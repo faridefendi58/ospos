@@ -43,12 +43,15 @@
     <div class="form-group form-group-sm">
         <?php echo form_label($this->lang->line('price_lists_unit_price'), 'unit_price', array('class'=>'required control-label col-xs-3')); ?>
         <div class='col-xs-8'>
-            <?php echo form_input(array(
-                    'name' => 'unit_price',
-                    'id' => 'unit_price',
-                    'class' => 'form-control input-sm',
-                    'value' => $price_list_item_info->unit_price)
-            );?>
+            <div class="input-group input-group-sm">
+                <span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
+                <?php echo form_input(array(
+                        'name' => 'unit_price',
+                        'id' => 'unit_price',
+                        'class' => 'form-control input-sm',
+                        'value' => to_currency_no_money($price_list_item_info->unit_price))
+                );?>
+            </div>
         </div>
     </div>
 </fieldset>

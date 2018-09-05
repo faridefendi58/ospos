@@ -84,5 +84,25 @@ class Item_quantity extends CI_Model
 
         return $this->db->update('item_quantities', array('quantity' => 0));
 	}
+
+	public function get_out_of_stock_soon($limit = 10) {
+        $max = $this->config->item("notif_limit_quantity");
+        if (empty($max)) {
+            return array();
+        }
+
+        $this->db->select('t.*, i.name AS item_name, n.id AS notification_id');
+        $this->db->from('item_quantities AS t');
+        $this->db->join('items as i', 'i.item_id = t.item_id');
+        $this->db->join('notifications as n', 'n.item_id = t.item_id AND n.person_id = '.$this->session->userdata('person_id'), 'left');
+        $this->db->where('t.quantity <=', $max);
+        $this->db->group_start();
+        $this->db->where('n.noticed_at ', null);
+        $this->db->or_where('n.is_closed ', 0);
+        $this->db->group_end();
+        $this->db->limit($limit);
+
+        return $this->db->get()->result();
+    }
 }
 ?>

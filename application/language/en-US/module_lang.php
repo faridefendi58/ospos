@@ -37,3 +37,5 @@ $lang["module_taxes"] = "Taxes";
 $lang["module_taxes_desc"] = "Configure Sales Taxes.";
 $lang["module_price_lists"] = "Price List";
 $lang["module_price_list_desc"] = "Add, Update, Delete, and Search Price List";
+$lang["module_item_expiration_dates"] = "Expiration Dates";
+$lang["module_item_expiration_dates_desc"] = "Add, Update, Delete, and Search Expiration Date";

@@ -4,6 +4,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<base href="<?php echo base_url();?>" />
 	<title><?php echo $this->config->item('company') . ' | ' . $this->lang->line('common_powered_by') . ' OSPOS ' . $this->config->item('application_version') ?></title>
+    <meta name="robots" content="noindex">
 	<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
 	<link rel="stylesheet" type="text/css" href="<?php echo 'dist/bootswatch/' . (empty($this->config->item('theme')) ? 'flatly' : $this->config->item('theme')) . '/bootstrap.min.css' ?>"/>
 
@@ -30,6 +31,7 @@
 		<link rel="stylesheet" type="text/css" href="css/receipt.css"/>
 		<link rel="stylesheet" type="text/css" href="css/register.css"/>
 		<link rel="stylesheet" type="text/css" href="css/reports.css"/>
+		<link rel="stylesheet" type="text/css" href="css/color_pink.css"/>
 		<!-- end css template tags -->
 		<!-- bower:js -->
 		<script src="bower_components/jquery/dist/jquery.js"></script>
@@ -119,7 +121,15 @@
 						<span class="icon-bar"></span>
 					</button>
 			
-					<a class="navbar-brand hidden-sm" href="<?php echo site_url(); ?>">OSPOS</a>
+					<a class="navbar-brand hidden-sm" href="<?php echo site_url(); ?>">
+                        <?php if($this->config->item('company_logo') != '') { ?>
+                            <img id="image"
+                                 src="<?php echo 'uploads/' . $this->config->item('company_logo'); ?>"
+                                 alt="<?php echo $this->config->item('company'); ?>" />
+                        <?php } else { ?>
+                            <?php echo $this->config->item('company'); ?>
+                        <?php } ?>
+                    </a>
 				</div>
 
 				<div class="navbar-collapse collapse">
@@ -138,5 +148,8 @@
 		</div>
 
 		<div class="container">
+            <?php if ($this->config->item("notification_enable")): ?>
+                <?php $this->load->view("partial/notification"); ?>
+            <?php endif; ?>
 			<div class="row">
 	 

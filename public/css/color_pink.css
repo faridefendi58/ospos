@@ -1,0 +1,10 @@
+.topbar {color: #eee;font-size: 12px;background: #8c074f;padding: 0.2em;}
+.topbar a {color: #ffffff;}
+.topbar a:hover {color: #ebebeb;}
+.navbar-default {background-color: #c60c71;border-color: transparent;}
+.navbar-brand {margin-bottom: 10px;}
+.navbar-brand img {max-height: 40px;}
+a {color: #c60c71;}
+a:hover, a:focus {color: #8c074f;}
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {color: #ebebeb;}
+.navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus {color: #ebebeb;}

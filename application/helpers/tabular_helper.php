@@ -655,6 +655,7 @@ function get_price_list_manage_table_headers()
         array('code' => $CI->lang->line('price_lists_code')),
         array('item_name' => $CI->lang->line('price_lists_name')),
         array('description' => $CI->lang->line('price_lists_description')),
+        array('is_default' => $CI->lang->line('price_lists_default')),
         array('status' => $CI->lang->line('price_lists_status')),
         array('created_at' => $CI->lang->line('price_lists_created_at'))
     );
@@ -678,6 +679,7 @@ function get_price_list_data_row($price_list)
         'item_name' => $price_list->name,
         'code' => $price_list->code,
         'description' => $price_list->description,
+        'is_default' => ($price_list->is_default>0)? $CI->lang->line('price_lists_default_yes') : $CI->lang->line('price_lists_default_no'),
         'status' => ($price_list->enabled)? $CI->lang->line('price_lists_status_enabled') : $CI->lang->line('price_lists_status_disabled'),
         'created_at' => date("d/m/Y H:i", strtotime($price_list->created_at)),
         'edit' => anchor(
@@ -725,6 +727,45 @@ function get_price_list_items_data_row($item) {
         'created_at' => date("d/m/Y H:i", strtotime($item->created_at)),
         'edit' => anchor(
             $controller_name ."/view_list/". $item->price_list_id ."?item_id=". $item->id,
+            '<span class="glyphicon glyphicon-edit"></span>',
+            array(
+                'class' => 'modal-dlg',
+                'data-btn-submit' => $CI->lang->line('common_submit'),
+                'title' => $CI->lang->line($controller_name.'_update')
+            )
+        )];
+}
+
+function get_item_expiration_date_manage_table_headers()
+{
+    $CI =& get_instance();
+
+    $headers = array(
+        array('id' => $CI->lang->line('item_expiration_dates_id')),
+        array('item_name' => $CI->lang->line('item_expiration_dates_item_name')),
+        array('quantity' => $CI->lang->line('item_expiration_dates_quantity')),
+        array('expired_at' => $CI->lang->line('item_expiration_dates_expired_at')),
+        array('status' => $CI->lang->line('price_lists_status')),
+        array('created_at' => $CI->lang->line('item_expiration_dates_created_at'))
+    );
+
+    return transform_headers($headers);
+}
+
+function get_item_expiration_date_data_row($item)
+{
+    $CI =& get_instance();
+    $controller_name = strtolower(get_class($CI));
+
+    return [
+        'id' => $item->id,
+        'item_name' => $item->item_name,
+        'quantity' => $item->quantity,
+        'expired_at' => date("d/m/Y", strtotime($item->expired_at)),
+        'status' => ($item->enabled > 0)? $CI->lang->line('price_lists_status_enabled') : $CI->lang->line('price_lists_status_disabled'),
+        'created_at' => date("d/m/Y H:i", strtotime($item->created_at)),
+        'edit' => anchor(
+            $controller_name ."/view/". $item->id,
             '<span class="glyphicon glyphicon-edit"></span>',
             array(
                 'class' => 'modal-dlg',

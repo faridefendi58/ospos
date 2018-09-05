@@ -37,3 +37,5 @@ $lang["module_taxes"] = "Pajak";
 $lang["module_taxes_desc"] = "";
 $lang["module_price_lists"] = "Daftar Harga";
 $lang["module_price_lists_desc"] = "Tambah, Rubah, Hapus dan Cari Daftar Harga";
+$lang["module_item_expiration_dates"] = "Tanggal Kadaluarsa";
+$lang["module_item_expiration_dates_desc"] = "Tambah, Rubah, Hapus dan Cari Tanggal Kadaluarsa";

@@ -67,6 +67,11 @@ $(document).ready(function()
             title='<?php echo $this->lang->line($controller_name . '_new'); ?>'>
         <span class="glyphicon glyphicon-tag">&nbsp</span><?php echo $this->lang->line($controller_name. '_new'); ?>
     </button>
+
+    <a class='btn btn-info btn-sm pull-right' href='<?php echo site_url("/item_expiration_dates"); ?>'
+            title='<?php echo $this->lang->line($controller_name . '_expiration'); ?>'>
+        <span class="glyphicon glyphicon-tag">&nbsp</span><?php echo $this->lang->line($controller_name. '_expiration'); ?>
+    </a>
 </div>
 
 <div id="toolbar">

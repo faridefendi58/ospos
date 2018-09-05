@@ -48,11 +48,13 @@ function _load_language_files($CI, $path, $language)
 {
     $map = directory_map($path . DIRECTORY_SEPARATOR . $language);
 
-    foreach($map as $file)
-	{
-        if(!is_array($file) && substr(strrchr($file, '.'), 1) == 'php')
-		{
-            $CI->lang->load(strtr($file, '', '_lang.php'), $language);
+    if (is_array($map)) {
+        foreach($map as $file)
+        {
+            if(!is_array($file) && substr(strrchr($file, '.'), 1) == 'php')
+            {
+                $CI->lang->load(strtr($file, '', '_lang.php'), $language);
+            }
         }
     }
 }
