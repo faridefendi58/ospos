@@ -68,7 +68,7 @@ $(document).ready(function()
         <span class="glyphicon glyphicon-tag">&nbsp</span><?php echo $this->lang->line($controller_name. '_new'); ?>
     </button>
 
-    <a class='btn btn-info btn-sm pull-right' href='<?php echo site_url($controller_name."/expiration"); ?>'
+    <a class='btn btn-info btn-sm pull-right' href='<?php echo site_url("/item_expiration_dates"); ?>'
             title='<?php echo $this->lang->line($controller_name . '_expiration'); ?>'>
         <span class="glyphicon glyphicon-tag">&nbsp</span><?php echo $this->lang->line($controller_name. '_expiration'); ?>
     </a>
