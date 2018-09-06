@@ -169,5 +169,24 @@ class Notifications extends CI_Model
 
         return (is_object($row))? $row->id : 0;
     }
+
+    public function get_closed_notification($limit = 10) {
+        $this->db->select('id, DATEDIFF(NOW(), noticed_at) AS diff');
+        $this->db->from('notifications');
+        $this->db->where('is_closed', 1);
+        $this->db->where('DATEDIFF(NOW(), noticed_at)>=', 1);
+        $this->db->order_by('noticed_at', 'asc');
+        $this->db->limit($limit);
+
+        $results = $this->db->get()->result();
+        $items = [];
+        if (is_array($results)) {
+            foreach ($results as $i => $result) {
+                array_push($items, $result->id);
+            }
+        }
+
+        return $items;
+    }
 }
 ?>
