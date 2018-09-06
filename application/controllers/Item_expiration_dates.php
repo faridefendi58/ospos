@@ -162,6 +162,10 @@ class Item_expiration_dates extends Secure_Controller
             echo json_encode(array('success' => 0));
         }
 
+        if ((int)$id <= 0) {
+            echo json_encode(array('success' => 0));
+        }
+
         $data = [
             'is_closed' => 1,
         ];
