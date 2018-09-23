@@ -162,6 +162,10 @@ class Item_expiration_dates extends Secure_Controller
             echo json_encode(array('success' => 0));
         }
 
+        if ((int)$id <= 0) {
+            echo json_encode(array('success' => 0));
+        }
+
         $data = [
             'is_closed' => 1,
         ];
@@ -178,6 +182,19 @@ class Item_expiration_dates extends Secure_Controller
         $data['info']  = $info;
 
         $this->load->view("item_expiration_dates/detail", $data);
+    }
+
+    /**
+     * Do it by cronjob, remove the notification whom closed more than 1 day
+     * @return bool
+     */
+    public function clear_old_notification() {
+        $datas = $this->Notifications->get_closed_notification(10);
+        if (is_array($datas) && count($datas)>0) {
+            return $this->Notifications->delete_list($datas);
+        }
+
+        return false;
     }
 }
 ?>

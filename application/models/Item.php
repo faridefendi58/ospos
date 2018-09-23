@@ -401,7 +401,7 @@ class Item extends CI_Model
 			if($this->db->insert('items', $item_data))
 			{
 				$item_data['item_id'] = $this->db->insert_id();
-				if($item_data['low_sell_item_id'] == -1)
+				if(array_key_exists('low_sell_item_id', $item_data) && $item_data['low_sell_item_id'] == -1)
 				{
 					$this->db->where('item_id', $item_data['item_id']);
 					$this->db->update('items', array('low_sell_item_id'=>$item_data['item_id']));

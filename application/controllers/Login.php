@@ -4,9 +4,14 @@ class Login extends CI_Controller
 {
 	public function index()
 	{
+		$r = $this->input->get('r');
 		if($this->Employee->is_logged_in())
 		{
-			redirect('home');
+			if (!empty($r)) {
+				redirect($r);
+			} else {
+                redirect('home');
+			}
 		}
 		else
 		{
@@ -21,11 +26,15 @@ class Login extends CI_Controller
 
 			if($this->form_validation->run() == FALSE)
 			{
-				$this->load->view('login');
+				$this->load->view('login', ['r' => $r]);
 			}
 			else
 			{
-				redirect('home');
+                if (!empty($r)) {
+                    redirect($r);
+                } else {
+                    redirect('home');
+                }
 			}
 		}
 	}
