@@ -2,6 +2,9 @@
 
 require_once("Secure_Controller.php");
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class Items extends Secure_Controller
 {
 	public function __construct()
@@ -735,8 +738,12 @@ class Items extends Secure_Controller
 		}
 		else
 		{
-			if(($handle = fopen($_FILES['file_path']['tmp_name'], 'r')) !== FALSE)
-			{
+			if(($handle = fopen($_FILES['file_path']['tmp_name'], 'r')) !== FALSE) {
+				// import from non csv
+                if ($_FILES['file_path']['type'] != 'text/csv') {
+                	$import_data = $this->do_import_from_xls($_FILES);
+                	echo $import_data; exit;
+				}
 				// Skip the first row as it's the table description
 				fgetcsv($handle);
 				$i = 1;
@@ -930,5 +937,190 @@ class Items extends Secure_Controller
 			}
 		}
 	}
+
+    /**
+	 * Handle import data form xls, xlsx, and ods format
+	 * col: Id, Barcode, item Name, Category, Company Name, Wholesale, Price, Retail Price,
+	 * Quantity, Tax Percent(s), Avatar, Description, Location ID
+     * @param $file
+     */
+	public function do_import_from_xls($file)
+	{
+        $renderType = 'Xlsx';
+        if ($file['file_path']['type'] == 'application/vnd.oasis.opendocument.spreadsheet') {
+            $renderType = 'Ods';
+        } elseif ($file['file_path']['type'] == 'application/vnd.ms-excel') {
+            $renderType = 'Xls';
+        } elseif ($file['file_path']['type'] == 'text/csv') {
+            $renderType = 'Csv';
+        }
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($renderType);
+        $reader->setReadDataOnly(TRUE);
+        $spreadsheet = $reader->load($file['file_path']['tmp_name']);
+
+        $worksheet = $spreadsheet->getActiveSheet();
+
+        $worksheet = $spreadsheet->getActiveSheet();
+        $highestRow = $worksheet->getHighestRow();
+        $highestColumn = $worksheet->getHighestColumn();
+        $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+
+        $rows = [];
+        $preview = '<table>' . "\n";
+        for ($row = 1; $row <= $highestRow; ++$row) {
+            $preview .= '<tr>' . PHP_EOL;
+            for ($col = 1; $col <= $highestColumnIndex; ++$col) {
+                $value = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+                $preview .= '<td>' . $value . '</td>' . PHP_EOL;
+                if ($row > 1)
+                	$rows[$row][$col] = $value;
+            }
+            $preview .= '</tr>' . PHP_EOL;
+        }
+        $preview .= '</table>' . PHP_EOL;
+
+        if (count($rows) <= 0) {
+        	return json_encode(array('success' => FALSE, 'message' => $this->lang->line('items_excel_import_nodata_wrongformat')));
+		}
+
+        $failCodes = [];
+		foreach ($rows as $i => $data) {
+			if (!empty($data[6])) {
+				$data[6] = $this->tofloat($data[6]);
+			}
+            if (!empty($data[7])) {
+                $data[7] = $this->tofloat($data[7]);
+            }
+            $item_data = array(
+                'name'					=> $data[3],
+                'description'			=> '',
+                'category'				=> $data[4],
+                'cost_price'			=> $data[6],
+                'unit_price'			=> $data[7],
+                'reorder_level'			=> '',
+                'supplier_id'			=> $this->Supplier->exists($data[5]) ? $data[5] : NULL,
+                'allow_alt_description'	=> '0',
+                'is_serialized'			=> '0',
+                'custom1'				=> '',
+                'custom2'				=> '',
+                'custom3'				=> '',
+                'custom4'				=> '',
+                'custom5'				=> '',
+                'custom6'				=> '',
+                'custom7'				=> '',
+                'custom8'				=> '',
+                'custom9'				=> '',
+                'custom10'				=> '',
+				'pic_filename'			=> $data[10]
+            );
+
+            $item_number = $data[2];
+            $invalidated = FALSE;
+            if($item_number != '')
+            {
+                $item_data['item_number'] = $item_number;
+                $invalidated = $this->Item->item_number_exists($item_number);
+            }
+
+            if(!$invalidated && $this->Item->save($item_data)) {
+                $items_taxes_data = NULL;
+                //tax
+				if (!empty($data[9])) {
+					if (strpos($data[9], ', ') !== false) {
+						$exps = explode(", ", $data[9]);
+					}
+				}
+
+                // quantities & inventory Info
+                $employee_id = $this->Employee->get_logged_in_employee_info()->person_id;
+                $emp_info = $this->Employee->get_info($employee_id);
+                $comment ='Qty '.$renderType.' Imported';
+
+                // array to store information if location got a quantity
+                $allowed_locations = $this->Stock_location->get_allowed_locations();
+                $location_id = 1;
+                // 12 is location
+                if (!empty($data[12]) && array_key_exists($data[12], $allowed_locations)) {
+                    $location_id = (int)$data[12];
+				}
+
+                $item_quantity_data = array(
+                    'item_id' => $item_data['item_id'],
+                    'location_id' => $location_id,
+                    'quantity' => $data[8],
+                );
+                $this->Item_quantity->save($item_quantity_data, $item_data['item_id'], $location_id);
+
+                $excel_data = array(
+                    'trans_items' => $item_data['item_id'],
+                    'trans_user' => $employee_id,
+                    'trans_comment' => $comment,
+                    'trans_location' => $location_id,
+                    'trans_inventory' => $data[8]
+                );
+
+                $this->Inventory->insert($excel_data);
+                unset($allowed_locations[$location_id]);
+
+                /*
+                 * now iterate through the array and check for which location_id no entry into item_quantities was made yet
+                 * those get an entry with quantity as 0.
+                 * unfortunately a bit duplicate code from above...
+                 */
+                foreach($allowed_locations as $location_id2 => $location_name)
+                {
+                    $item_quantity_data = array(
+                        'item_id' => $item_data['item_id'],
+                        'location_id' => $location_id2,
+                        'quantity' => 0,
+                    );
+                    $this->Item_quantity->save($item_quantity_data, $item_data['item_id'], $location_id);
+
+                    $excel_data = array(
+                        'trans_items' => $item_data['item_id'],
+                        'trans_user' => $employee_id,
+                        'trans_comment' => $comment,
+                        'trans_location' => $location_id2,
+                        'trans_inventory' => 0
+                    );
+
+                    $this->Inventory->insert($excel_data);
+                }
+            }
+            else //insert or update item failure
+            {
+                $failCodes[] = $i;
+            }
+		}
+
+        if(count($failCodes) > 0) {
+            $message = $this->lang->line('items_excel_import_partially_failed') . ' (' . count($failCodes) . '): ' . implode(', ', $failCodes);
+
+            return json_encode(array('success' => FALSE, 'message' => $message));
+        } else {
+            return json_encode(array('success' => TRUE, 'message' => $this->lang->line('items_excel_import_success')));
+        }
+	}
+
+    /**
+	 * String money format to float
+     * @param $num
+     * @return float
+     */
+    public function tofloat($num) {
+        $dotPos = strrpos($num, '.');
+        $commaPos = strrpos($num, ',');
+        $sep = (($dotPos > $commaPos) && $dotPos) ? $dotPos :
+            ((($commaPos > $dotPos) && $commaPos) ? $commaPos : false);
+
+        if (!$sep) {
+            return floatval(preg_replace("/[^0-9]/", "", $num));
+        }
+
+        return floatval(
+            preg_replace("/[^0-9]/", "", substr($num, 0, $sep)) . '.' .
+            preg_replace("/[^0-9]/", "", substr($num, $sep+1, strlen($num)))
+        );
+    }
 }
 ?>
