@@ -1,6 +1,6 @@
 <ul id="error_message_box" class="error_message_box"></ul>
 
-<?php echo form_open_multipart('price_lists/do_excel_import/'.$price_list_id, array('id'=>'excel_form', 'class'=>'form-horizontal')); ?>
+<?php echo form_open_multipart('suppliers/do_excel_import', array('id'=>'excel_form', 'class'=>'form-horizontal')); ?>
 <fieldset id="item_basic_info">
     <div class="form-group form-group-sm">
         <div class="col-xs-12">

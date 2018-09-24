@@ -2,6 +2,9 @@
 
 require_once("Secure_Controller.php");
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class Price_lists extends Secure_Controller
 {
 	public function __construct()
@@ -313,6 +316,12 @@ class Price_lists extends Secure_Controller
         {
             if(($handle = fopen($_FILES['file_path']['tmp_name'], 'r')) !== FALSE)
             {
+                // import from non csv
+                if ($_FILES['file_path']['type'] != 'text/csv') {
+                    $import_data = $this->do_import_from_xls($_FILES, $price_list_id);
+                    echo $import_data; exit;
+                }
+
                 // Skip the first row as it's the table description
                 fgetcsv($handle);
                 $i = 1;
@@ -395,6 +404,106 @@ class Price_lists extends Secure_Controller
             {
                 echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('items_excel_import_nodata_wrongformat')));
             }
+        }
+    }
+
+    /**
+     * Handle import data form xls, xlsx, and ods format
+     * col: Item ID, Price Code, Price List Name, Unit Price, Created_At
+     * @param $file
+     */
+    public function do_import_from_xls($file, $price_list_id)
+    {
+        $renderType = 'Xlsx';
+        if ($file['file_path']['type'] == 'application/vnd.oasis.opendocument.spreadsheet') {
+            $renderType = 'Ods';
+        } elseif ($file['file_path']['type'] == 'application/vnd.ms-excel') {
+            $renderType = 'Xls';
+        } elseif ($file['file_path']['type'] == 'text/csv') {
+            $renderType = 'Csv';
+        }
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($renderType);
+        $reader->setReadDataOnly(TRUE);
+        $spreadsheet = $reader->load($file['file_path']['tmp_name']);
+
+        $worksheet = $spreadsheet->getActiveSheet();
+
+        $worksheet = $spreadsheet->getActiveSheet();
+        $highestRow = $worksheet->getHighestRow();
+        $highestColumn = $worksheet->getHighestColumn();
+        $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+
+        $rows = [];
+        $preview = '<table>' . "\n";
+        for ($row = 1; $row <= $highestRow; ++$row) {
+            $preview .= '<tr>' . PHP_EOL;
+            for ($col = 1; $col <= $highestColumnIndex; ++$col) {
+                $value = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+                $preview .= '<td>' . $value . '</td>' . PHP_EOL;
+                if ($row > 1)
+                    $rows[$row][$col] = $value;
+            }
+            $preview .= '</tr>' . PHP_EOL;
+        }
+        $preview .= '</table>' . PHP_EOL;
+
+        if (count($rows) <= 0) {
+            return json_encode(array('success' => FALSE, 'message' => $this->lang->line('items_excel_import_nodata_wrongformat')));
+        }
+
+        $failCodes = [];
+        foreach ($rows as $i => $data) {
+            if (!empty($data[5])) {
+                $data[5] = $this->tofloat($data[5]);
+            }
+            $item_data = array(
+                'name' => $data[4],
+                'unit_price' => $data[5]
+            );
+
+            $item_number = $data[3];
+            $invalidated = FALSE;
+            if($item_number != '')
+            {
+                $item_data['item_number'] = $item_number;
+                $invalidated = $this->Item->item_number_exists($item_number);
+            }
+
+            if($invalidated) {
+                $item_info = $this->Item->get_info_by_id_or_number($item_data['item_number']);
+                if (is_object($item_info)) {
+                    $item_data['item_id'] = $item_info->item_id;
+                }
+
+                $params = [
+                    'price_list_id' => $price_list_id,
+                    'item_id' => $item_data['item_id'],
+                    'unit_price' => $item_data['unit_price'],
+                    'updated_at' => date("Y-m-d H:i:s")
+                ];
+
+                $pl_item = $this->Price_list_items->find_one_by($price_list_id, $item_data['item_id']);
+                $price_list_item_id = -1;
+                if (is_object($pl_item)) {
+                    $price_list_item_id = $pl_item->id;
+                } else {
+                    $params['created_at'] = date("Y-m-d H:i:s");
+                }
+
+                if ($this->Price_list_items->save($params, $price_list_item_id)) {
+                    $success = true;
+                }
+            } else { //insert or update item failure
+                $failCodes[] = $i;
+            }
+        }
+
+        if(count($failCodes) > 0) {
+            $message = $this->lang->line('items_excel_import_partially_failed') . ' (' . count($failCodes) . '): ' . implode(', ', $failCodes);
+
+            return json_encode(array('success' => FALSE, 'message' => $message));
+        } else {
+            return json_encode(array('success' => TRUE, 'message' => $this->lang->line('items_excel_import_success')));
         }
     }
 }

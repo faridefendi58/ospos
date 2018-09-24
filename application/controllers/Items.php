@@ -1101,26 +1101,5 @@ class Items extends Secure_Controller
             return json_encode(array('success' => TRUE, 'message' => $this->lang->line('items_excel_import_success')));
         }
 	}
-
-    /**
-	 * String money format to float
-     * @param $num
-     * @return float
-     */
-    public function tofloat($num) {
-        $dotPos = strrpos($num, '.');
-        $commaPos = strrpos($num, ',');
-        $sep = (($dotPos > $commaPos) && $dotPos) ? $dotPos :
-            ((($commaPos > $dotPos) && $commaPos) ? $commaPos : false);
-
-        if (!$sep) {
-            return floatval(preg_replace("/[^0-9]/", "", $num));
-        }
-
-        return floatval(
-            preg_replace("/[^0-9]/", "", substr($num, 0, $sep)) . '.' .
-            preg_replace("/[^0-9]/", "", substr($num, $sep+1, strlen($num)))
-        );
-    }
 }
 ?>

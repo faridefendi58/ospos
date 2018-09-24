@@ -101,7 +101,7 @@ class Price_list_items extends CI_Model
         if($count_only == TRUE) {
             $this->db->select('COUNT(t.id) as count');
         } else {
-            $this->db->select('t.*, t.item_id, i.name AS item_name, l.code AS price_list_code, l.name AS price_list_name');
+            $this->db->select('t.*, t.item_id, i.name AS item_name, i.item_number AS barcode, l.code AS price_list_code, l.name AS price_list_name');
         }
 
         $this->db->from('price_list_items AS t');

@@ -707,6 +707,7 @@ function get_price_list_items_table_headers()
     $headers = array(
         array('id' => $CI->lang->line('price_lists_item_id')),
         array('code' => $CI->lang->line('price_lists_code')),
+        array('barcode' => $CI->lang->line('items_item_number')),
         array('item_name' => $CI->lang->line('price_lists_name')),
         array('unit_price' => $CI->lang->line('price_lists_unit_price')),
         array('created_at' => $CI->lang->line('price_lists_created_at'))
@@ -722,8 +723,9 @@ function get_price_list_items_data_row($item) {
     return [
         'id' => $item->id,
         'code' => $item->price_list_code,
+        'barcode' => $item->barcode,
         'item_name' => $item->item_name,
-        'unit_price' => number_format($item->unit_price, 0, ',', '.'),
+        'unit_price' => to_currency($item->unit_price),
         'created_at' => date("d/m/Y H:i", strtotime($item->created_at)),
         'edit' => anchor(
             $controller_name ."/view_list/". $item->price_list_id ."?item_id=". $item->id,

@@ -189,5 +189,16 @@ class Person extends CI_Model
 	{
 		return TRUE;
  	}
+
+    public function find_one_by($data)
+    {
+        $query = $this->db->get_where('people', $data, 1);
+
+        if($query->num_rows() == 1) {
+            return $query->row();
+        }
+
+        return false;
+    }
 }
 ?>
