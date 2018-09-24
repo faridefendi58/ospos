@@ -1,10 +1,10 @@
 <ul id="error_message_box" class="error_message_box"></ul>
 
-<?php echo form_open_multipart('suppliers/do_excel_import', array('id'=>'excel_form', 'class'=>'form-horizontal')); ?>
+<?php echo form_open_multipart('item_expiration_dates/do_excel_import', array('id'=>'excel_form', 'class'=>'form-horizontal')); ?>
 <fieldset id="item_basic_info">
     <div class="form-group form-group-sm">
         <div class="col-xs-12">
-            <a href="<?php echo site_url('suppliers/excel'); ?>"><?php echo $this->lang->line('common_download_import_template'); ?></a>
+            <a href="<?php echo site_url('item_expiration_dates/excel'); ?>"><?php echo $this->lang->line('common_download_import_template'); ?></a>
         </div>
     </div>
 

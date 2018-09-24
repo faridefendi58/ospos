@@ -161,6 +161,13 @@ class Suppliers extends Persons
 		}
 	}
 
+    public function excel()
+    {
+        $name = 'template_import_supliers.xls';
+        $data = file_get_contents('../' . $name);
+        force_download($name, $data);
+    }
+
     public function excel_import()
     {
         $this->load->view('suppliers/form_excel_import', NULL);

@@ -744,6 +744,7 @@ function get_item_expiration_date_manage_table_headers()
 
     $headers = array(
         array('id' => $CI->lang->line('item_expiration_dates_id')),
+        array('barcode' => $CI->lang->line('items_item_number')),
         array('item_name' => $CI->lang->line('item_expiration_dates_item_name')),
         array('quantity' => $CI->lang->line('item_expiration_dates_quantity')),
         array('expired_at' => $CI->lang->line('item_expiration_dates_expired_at')),
@@ -761,9 +762,10 @@ function get_item_expiration_date_data_row($item)
 
     return [
         'id' => $item->id,
+        'barcode' => $item->barcode,
         'item_name' => $item->item_name,
         'quantity' => $item->quantity,
-        'expired_at' => date("d/m/Y", strtotime($item->expired_at)),
+        'expired_at' => date("d-m-Y", strtotime($item->expired_at)),
         'status' => ($item->enabled > 0)? $CI->lang->line('price_lists_status_enabled') : $CI->lang->line('price_lists_status_disabled'),
         'created_at' => date("d/m/Y H:i", strtotime($item->created_at)),
         'edit' => anchor(

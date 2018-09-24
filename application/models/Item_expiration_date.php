@@ -127,7 +127,7 @@ class Item_expiration_date extends CI_Model
         if($count_only == TRUE) {
             $this->db->select('COUNT(t.id) as count');
         } else {
-            $this->db->select('t.*, i.name AS item_name');
+            $this->db->select('t.*, i.name AS item_name, i.item_number AS barcode');
         }
 
         $this->db->from('item_expiration_dates AS t');

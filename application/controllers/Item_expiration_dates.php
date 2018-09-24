@@ -196,5 +196,105 @@ class Item_expiration_dates extends Secure_Controller
 
         return false;
     }
+
+    public function excel()
+    {
+        $name = 'template_import_expirations.xls';
+        $data = file_get_contents('../' . $name);
+        force_download($name, $data);
+    }
+
+    public function excel_import()
+    {
+        $this->load->view('item_expiration_dates/form_excel_import', NULL);
+    }
+
+    /**
+     * * Handle import data form xls, xlsx, and ods format
+     * col: ID, Barcode, Item Name, Quantity, Expired At, Status, Created At
+     */
+    public function do_excel_import()
+    {
+        if($_FILES['file_path']['error'] != UPLOAD_ERR_OK) {
+            echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('customers_excel_import_failed')));
+        } else {
+            if(($handle = fopen($_FILES['file_path']['tmp_name'], 'r')) !== FALSE) {
+
+                $renderType = 'Xlsx';
+                if ($_FILES['file_path']['type'] == 'application/vnd.oasis.opendocument.spreadsheet') {
+                    $renderType = 'Ods';
+                } elseif ($_FILES['file_path']['type'] == 'application/vnd.ms-excel') {
+                    $renderType = 'Xls';
+                } elseif ($_FILES['file_path']['type'] == 'text/csv') {
+                    $renderType = 'Csv';
+                }
+                $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($renderType);
+                $reader->setReadDataOnly(TRUE);
+                $spreadsheet = $reader->load($_FILES['file_path']['tmp_name']);
+
+                $worksheet = $spreadsheet->getActiveSheet();
+
+                $worksheet = $spreadsheet->getActiveSheet();
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+                $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+
+                $rows = [];
+                $preview = '<table>' . "\n";
+                for ($row = 1; $row <= $highestRow; ++$row) {
+                    $preview .= '<tr>' . PHP_EOL;
+                    for ($col = 1; $col <= $highestColumnIndex; ++$col) {
+                        $value = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+                        $preview .= '<td>' . $value . '</td>' . PHP_EOL;
+                        if ($row > 1)
+                            $rows[$row][$col] = $value;
+                    }
+                    $preview .= '</tr>' . PHP_EOL;
+                }
+                $preview .= '</table>' . PHP_EOL;
+
+                if (count($rows) <= 0) {
+                    return json_encode(array('success' => FALSE, 'message' => $this->lang->line('items_excel_import_nodata_wrongformat')));
+                }
+
+                $failCodes = [];
+                foreach ($rows as $i => $data) {
+                    $barcode = $this->xss_clean($data[2]);
+                    $item_name = $this->xss_clean($data[3]);
+                    $exp_data = array(
+                        'quantity' => $this->xss_clean($data[4]),
+                        'expired_at' => date("Y-m-d H:i:s", strtotime($this->xss_clean($data[5]))),
+                        'notes' => (!empty($data[8]))? $this->xss_clean($data[8]) : null,
+                        'enabled' => 1,
+                        'created_at' => date("Y-m-d H:i:s"),
+                        'updated_at' => date("Y-m-d H:i:s")
+                    );
+                    $id = -1;
+                    $item = $this->Item->find_one_by(['item_number' => $barcode]);
+                    if (is_object($item)) {
+                        $exp_data['item_id'] = $item->item_id;
+                        $exp_data['base_quantity'] = $exp_data['quantity'];
+                        if($this->Item_expiration_date->save($exp_data, $id)) {
+                            $success = true;
+                        } else { //insert or update item failure
+                            $failCodes[] = $i;
+                        }
+                    } else {
+                        $failCodes[] = $i;
+                    }
+                }
+
+                if(count($failCodes) > 0) {
+                    $message = $this->lang->line('customers_excel_import_partially_failed') . ' (' . count($failCodes) . '): ' . implode(', ', $failCodes);
+
+                    echo json_encode(array('success' => FALSE, 'message' => $message));
+                } else {
+                    echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('customers_excel_import_success')));
+                }
+            } else {
+                echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('customers_excel_import_nodata_wrongformat')));
+            }
+        }
+    }
 }
 ?>
