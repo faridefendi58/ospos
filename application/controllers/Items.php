@@ -991,6 +991,11 @@ class Items extends Secure_Controller
             if (!empty($data[7])) {
                 $data[7] = $this->tofloat($data[7]);
             }
+            $sup = $this->Supplier->find_one_by(['company_name' => $data[5]]);
+            $supplier_id = (int) $data[5];
+			if (is_object($sup)) {
+                $supplier_id = $sup->person_id;
+			}
             $item_data = array(
                 'name'					=> $data[3],
                 'description'			=> '',
@@ -998,7 +1003,7 @@ class Items extends Secure_Controller
                 'cost_price'			=> $data[6],
                 'unit_price'			=> $data[7],
                 'reorder_level'			=> '',
-                'supplier_id'			=> $this->Supplier->exists($data[5]) ? $data[5] : NULL,
+                'supplier_id'			=> $supplier_id,
                 'allow_alt_description'	=> '0',
                 'is_serialized'			=> '0',
                 'custom1'				=> '',

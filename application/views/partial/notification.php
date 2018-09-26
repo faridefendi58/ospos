@@ -20,6 +20,7 @@
                     console.log("Length :"+ data.messages.length);
                     for (i = 0; i < data.messages.length; i++) {
                         var unique_class = data.messages[i]['id']+"-"+i;
+                        console.log("unique_class : "+unique_class);
                         var a_dismisable = $("#notification-container").find('div.alert-template');
                         if (u_class.includes(unique_class) == false) {
                             u_class.push(unique_class);
@@ -56,6 +57,7 @@
         });
         $('#notif-alert-group').find('button.close').click(function () {
             var id = $(this).attr('id');
+            console.log("id :"+ id);
             $.ajax({
                 type: 'POST',
                 url: "<?php echo site_url('item_expiration_dates/close_notification'); ?>/"+id,

@@ -85,8 +85,8 @@ class Price_list_items extends CI_Model
         return $this->db->count_all_results();
     }
 
-    public function get_found_rows($search) {
-        return $this->search($search, 0, 0, 'item_id', 'asc', TRUE);
+    public function get_found_rows($search, $price_list_id = 0) {
+        return $this->search($search, 0, 0, 'item_id', 'asc', TRUE, $price_list_id);
     }
 
     public function search(

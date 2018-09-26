@@ -211,7 +211,7 @@ class Price_lists extends Secure_Controller
         $order  = $this->input->get('order');
 
         $price_lists = $this->Price_list_items->search($search, $limit, $offset, $sort, $order, false, $id);
-        $total_rows = $this->Price_list_items->get_found_rows($search);
+        $total_rows = $this->Price_list_items->get_found_rows($search, $id);
 
         $data_rows = array();
         if (is_array($price_lists->result())) {
