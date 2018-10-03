@@ -16,6 +16,7 @@ class Sale_lib
 		$this->CI->load->library('tax_lib');
 		$this->CI->load->model('enums/Rounding_mode');
         $this->CI->load->model('Price_list');
+        $this->CI->load->model('Partner');
 	}
 
 	public function get_line_sequence_options()

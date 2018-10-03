@@ -16,6 +16,7 @@ class Sales extends Secure_Controller
 		$this->load->library('email_lib');
 		$this->load->library('token_lib');
         $this->load->model('Price_list');
+        $this->load->model('Partner');
 	}
 
 	public function index()
@@ -649,6 +650,7 @@ class Sales extends Secure_Controller
 				{
 					$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['sale_id']);
 					$this->load->view('sales/invoice', $data);
+                    $this->Partner->store_partner_data($data['sale_id_num']); //save the partner data
 					$this->sale_lib->clear_all();
 				}
 			}
@@ -692,6 +694,7 @@ class Sales extends Secure_Controller
 				$data['barcode'] = NULL;
 
 				$this->load->view('sales/work_order', $data);
+                $this->Partner->store_partner_data($data['sale_id_num']); //save the partner data
 				$this->sale_lib->clear_mode();
 				$this->sale_lib->clear_all();
 			}
@@ -729,6 +732,7 @@ class Sales extends Secure_Controller
 				$data['barcode'] = NULL;
 
 				$this->load->view('sales/quote', $data);
+                $this->Partner->store_partner_data($data['sale_id_num']); //save the partner data
 				$this->sale_lib->clear_mode();
 				$this->sale_lib->clear_all();
 			}
@@ -765,6 +769,7 @@ class Sales extends Secure_Controller
 				$data['cart'] = $this->get_filtered($this->sale_lib->get_cart_reordered($data['sale_id_num']));
 
 				$this->load->view('sales/receipt', $data);
+                $this->Partner->store_partner_data($data['sale_id_num']); //save the partner data
 				$this->sale_lib->clear_all();
 			}
 		}
@@ -1093,6 +1098,18 @@ class Sales extends Secure_Controller
 
 		$data['price_lists'] = $this->Price_list->get_list_options();
 		$data['price_list_default'] = $this->sale_lib->get_price_list();
+		$data['price_list_code'] = $data['price_lists'][$data['price_list_default']];
+		//get the cookie of sales another data
+		$data['partners'] = [];
+		if (isset($_COOKIE['sales_patient'])) {
+            $data['partners']['nama_pasien'] = $_COOKIE['sales_patient'];
+		}
+        if (isset($_COOKIE['sales_doctor'])) {
+            $data['partners']['nama_dokter'] = $_COOKIE['sales_doctor'];
+        }
+        if (isset($_COOKIE['sales_doctor_address'])) {
+            $data['partners']['alamat_dokter'] = $_COOKIE['sales_doctor_address'];
+        }
 
 		$data = $this->xss_clean($data);
 
@@ -1453,5 +1470,19 @@ class Sales extends Secure_Controller
 		}
 		return NULL;
 	}
+
+    public function suggest_patient()
+    {
+        $suggestions = $this->xss_clean($this->Partner->get_search_patient_suggestions($this->input->get('nama_pasien'), TRUE));
+
+        echo json_encode($suggestions);
+    }
+
+    public function suggest_doctor()
+    {
+        $suggestions = $this->xss_clean($this->Partner->get_search_doctor_suggestions($this->input->get('nama_dokter'), TRUE));
+
+        echo json_encode($suggestions);
+    }
 }
 ?>

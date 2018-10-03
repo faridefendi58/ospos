@@ -298,6 +298,12 @@ if(isset($success))
 
 <div id="overall_sale" class="panel panel-default">
 	<div class="panel-body">
+        <?php if ($price_list_code == 'HJR'): ?>
+            <?php $this->load->view("sales/_hjr_form"); ?>
+        <?php elseif ($price_list_code == 'HJD'): ?>
+            <?php $this->load->view("sales/_hjd_form"); ?>
+        <?php endif; ?>
+
 		<?php echo form_open($controller_name."/select_customer", array('id'=>'select_customer_form', 'class'=>'form-horizontal')); ?>
 			<?php
 			if(isset($customer))
