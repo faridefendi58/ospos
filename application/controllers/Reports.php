@@ -40,10 +40,17 @@ class Reports extends Secure_Controller
 	{
 		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => $sale_type, 'location_id' => $location_id);
 
+        /** addition for restrict cashier report */
+		$person_id = $this->session->userdata('person_id');
+        if($this->Employee->has_grant('reports_cashier_sales', $person_id)) {
+            $inputs['employee_id'] = $person_id;
+        }
+
 		$this->load->model('reports/Summary_sales');
 		$model = $this->Summary_sales;
 
 		$report_data = $model->getData($inputs);
+
 		$summary = $this->xss_clean($model->getSummaryData($inputs));
 
 		$tabular_data = array();

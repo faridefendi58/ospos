@@ -2,6 +2,7 @@
 
 $lang["reports_all"] = "Semua";
 $lang["reports_canceled"] = "Ditunda";
+$lang["reports_cashier"] = "Penjualan (Hanya Sebagai Kasir)";
 $lang["reports_categories"] = "Kategori";
 $lang["reports_categories_summary_report"] = "Laporan Ringkasan Kategori";
 $lang["reports_category"] = "Kategori";
@@ -13,7 +14,7 @@ $lang["reports_code_return"] = "RET";
 $lang["reports_code_type"] = "Type";
 $lang["reports_code_work_order"] = "W/O";
 $lang["reports_comments"] = "Catatan";
-$lang["reports_complete"] = "Penjualan dan Pengembalian yang Diselesaikan";
+$lang["reports_complete"] = "Penjualan dan Pengembalian";
 $lang["reports_completed_sales"] = "Penjualan Selesai";
 $lang["reports_confirm_delete"] = "Anda yakin ingin mengapus ini?";
 $lang["reports_confirm_restore"] = "Anda yakin ingin memulihkan data ini?";
@@ -72,7 +73,7 @@ $lang["reports_payments_summary_report"] = "Laporan Ringkasan Pembayaran";
 $lang["reports_profit"] = "Keuntungan/Laba";
 $lang["reports_quantity"] = "Jumlah";
 $lang["reports_quantity_purchased"] = "Jumlah Dibeli";
-$lang["reports_quotes"] = "Tanda Kutip";
+$lang["reports_quotes"] = "Quote";
 $lang["reports_received_by"] = "Diterima Oleh";
 $lang["reports_receiving_id"] = "Id Penerima";
 $lang["reports_receiving_type"] = "Type Diterima";

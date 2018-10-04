@@ -63,6 +63,7 @@ class Employees extends Persons
 
 			$modules[] = $module;
 		}
+
 		$data['all_modules'] = $modules;
 
 		$permissions = array();

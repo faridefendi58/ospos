@@ -126,6 +126,11 @@ abstract class Summary_report extends Report
 			$this->db->where('sales.sale_status', COMPLETED);
 			$this->db->where('sales.sale_type', SALE_TYPE_RETURN);
 		}
+
+		/** addition for restrict cashier report */
+		if (isset($inputs['employee_id'])) {
+            $this->db->where('sales.employee_id', $inputs['employee_id']);
+		}
 	}
 
 	/**
