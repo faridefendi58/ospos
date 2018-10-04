@@ -22,6 +22,7 @@
 
 <script type="text/javascript">
     $(function () {
+        var sales_patient = 0;
         $("#nama-pasien").autocomplete(
             {
                 source: "<?php echo site_url("sales/suggest_patient"); ?>",
@@ -30,6 +31,7 @@
                 select: function (a, ui) {
                     $(this).val(ui.item.value);
                     setCookie('sales_patient', ui.item.value, 1);
+                    sales_patient = 1;
                 }
             });
         $("#nama-dokter").autocomplete(
@@ -42,6 +44,11 @@
                     setCookie('sales_doctor', ui.item.value, 1);
                 }
             });
+        $('#nama-pasien').blur(function () {
+            if ($(this).val().length > 0 && sales_patient == 0) {
+                setCookie('sales_patient', $(this).val());
+            }
+        });
     });
     function setCookie(cname, cvalue, exdays) {
         var d = new Date();

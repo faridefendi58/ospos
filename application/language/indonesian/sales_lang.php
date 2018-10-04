@@ -163,3 +163,6 @@ $lang["sales_work_order_number"] = "";
 $lang["sales_work_order_number_duplicate"] = "";
 $lang["sales_work_order_sent"] = "";
 $lang["sales_work_order_unsent"] = "";
+$lang["sales_patient_name"] = "Nama Pasien";
+$lang["sales_doctor_name"] = "Nama Dokter";
+$lang["sales_doctor_address"] = "Alamat Dokter";

@@ -649,9 +649,9 @@ class Sales extends Secure_Controller
 				else
 				{
 					$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['sale_id']);
+                    $data['partner'] = $this->store_the_partner_data($data['sale_id_num']); //save the partner data
 					$this->load->view('sales/invoice', $data);
-                    $this->Partner->store_partner_data($data['sale_id_num']); //save the partner data
-					$this->sale_lib->clear_all();
+                    $this->sale_lib->clear_all();
 				}
 			}
 		}
@@ -693,8 +693,9 @@ class Sales extends Secure_Controller
 
 				$data['barcode'] = NULL;
 
+                $data['partner'] = $this->store_the_partner_data($data['sale_id_num']); //save the partner data
+
 				$this->load->view('sales/work_order', $data);
-                $this->Partner->store_partner_data($data['sale_id_num']); //save the partner data
 				$this->sale_lib->clear_mode();
 				$this->sale_lib->clear_all();
 			}
@@ -731,8 +732,10 @@ class Sales extends Secure_Controller
 
 				$data['barcode'] = NULL;
 
+                $data['partner'] = $this->store_the_partner_data($data['sale_id_num']); //save the partner data
+
 				$this->load->view('sales/quote', $data);
-                $this->Partner->store_partner_data($data['sale_id_num']); //save the partner data
+
 				$this->sale_lib->clear_mode();
 				$this->sale_lib->clear_all();
 			}
@@ -768,8 +771,9 @@ class Sales extends Secure_Controller
 				// Reload (sorted) and filter the cart line items for printing purposes
 				$data['cart'] = $this->get_filtered($this->sale_lib->get_cart_reordered($data['sale_id_num']));
 
+				$data['partner'] = $this->store_the_partner_data($data['sale_id_num']); //save the partner data
+
 				$this->load->view('sales/receipt', $data);
-                $this->Partner->store_partner_data($data['sale_id_num']); //save the partner data
 				$this->sale_lib->clear_all();
 			}
 		}
@@ -985,6 +989,13 @@ class Sales extends Secure_Controller
 		{
 			$data['mode_label'] = $this->lang->line('sales_receipt');
 			$data['customer_required'] = $this->lang->line('sales_customer_optional');
+		}
+
+		$partner_info = $this->Partner->get_info($data['sale_id_num']);
+		if (!empty($partner_info) && is_object($partner_info)) {
+            $data['partner']['doctor_name'] = $partner_info->doctor_name;
+            $data['partner']['doctor_address'] = $partner_info->doctor_address;
+            $data['partner']['patient_name'] = $partner_info->patient_name;
 		}
 
 		return $this->xss_clean($data);
@@ -1484,5 +1495,21 @@ class Sales extends Secure_Controller
 
         echo json_encode($suggestions);
     }
+
+    private function store_the_partner_data($sale_id_num)
+	{
+        $store_partner = $this->Partner->store_partner_data($sale_id_num); //save the partner data
+		$partner = [];
+        if ($store_partner) {
+            $partner_info = $this->Partner->get_info($sale_id_num);
+            if (!empty($partner_info) && is_object($partner_info)) {
+                $partner['doctor_name'] = $partner_info->doctor_name;
+                $partner['doctor_address'] = $partner_info->doctor_address;
+                $partner['patient_name'] = $partner_info->patient_name;
+            }
+        }
+
+        return $partner;
+	}
 }
 ?>

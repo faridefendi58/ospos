@@ -46,10 +46,10 @@ class Partner extends CI_Model
     /*
     Gets information about a particular partner
     */
-    public function get_info($partner_id)
+    public function get_info($sale_id)
     {
         $this->db->from('sales_partners');
-        $this->db->where('id', $partner_id);
+        $this->db->where('sale_id', $sale_id);
         $this->db->where('deleted', 0);
 
         $query = $this->db->get();
@@ -98,6 +98,8 @@ class Partner extends CI_Model
             $this->db->from('sales_partners');
             $this->db->where('doctor_name', $doctor_name);
             $this->db->where('deleted', 0);
+            $this->db->order_by("id","desc");
+            $this->db->limit(1);
 
             $query = $this->db->get();
 

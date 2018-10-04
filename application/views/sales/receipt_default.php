@@ -53,6 +53,25 @@
 		?>
 
 		<div id="employee"><?php echo $this->lang->line('employees_employee').": ".$employee; ?></div>
+        <?php if ($partner):?>
+            <div id="partner" style="margin-top: 10px;">
+                <?php
+                if (array_key_exists('patient_name', $partner) && !empty($partner['patient_name'])) {
+                    echo $this->lang->line('sales_patient_name') . " : <b>" . $partner['patient_name'] . "</b><br/>";
+                }
+                ?>
+                <?php
+                if (array_key_exists('doctor_name', $partner) && !empty($partner['doctor_name'])) {
+                    echo $this->lang->line('sales_doctor_name') . " : <b>" . $partner['doctor_name'] . "</b><br/>";
+                }
+                ?>
+                <?php
+                if (array_key_exists('doctor_address', $partner) && !empty($partner['doctor_address'])) {
+                    echo $this->lang->line('sales_doctor_address')." : <b>".$partner['doctor_address']."</b>";
+                }
+                ?>
+            </div>
+        <?php endif; ?>
 	</div>
 
 	<table id="receipt_items">

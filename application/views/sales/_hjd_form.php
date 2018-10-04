@@ -19,6 +19,7 @@
 
 <script type="text/javascript">
     $(function () {
+        var sales_doctor = 0;
         $("#nama-dokter").autocomplete(
             {
                 source: "<?php echo site_url("sales/suggest_doctor"); ?>",
@@ -27,12 +28,18 @@
                 select: function (a, ui) {
                     $(this).val(ui.item.value);
                     setCookie('sales_doctor', ui.item.value, 1);
+                    sales_doctor = 1;
                     if (ui.item.address.length > 0) {
                         $('#alamat-dokter').val(ui.item.address);
                         setCookie('sales_doctor_address', ui.item.address);
                     }
                 }
             });
+        $('#nama-dokter').blur(function () {
+            if ($(this).val().length > 0 && sales_doctor == 0) {
+                setCookie('sales_doctor', $(this).val());
+            }
+        });
         $('#alamat-dokter').blur(function () {
             if ($(this).val().length > 0) {
                 setCookie('sales_doctor_address', $(this).val());
