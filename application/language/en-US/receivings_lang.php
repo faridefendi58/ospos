@@ -47,6 +47,7 @@ $lang["receivings_supplier"] = "Supplier";
 $lang["receivings_supplier_address"] = "Address";
 $lang["receivings_supplier_email"] = "Email";
 $lang["receivings_supplier_location"] = "Location";
+$lang["receivings_tax"] = "Pajak %";
 $lang["receivings_total"] = "Total";
 $lang["receivings_transaction_failed"] = "Receivings transaction(s) failed.";
 $lang["receivings_unable_to_add_item"] = "Item add to Receiving failed.";

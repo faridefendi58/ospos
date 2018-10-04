@@ -108,6 +108,7 @@ if (isset($success))
 				<th style="width:10%;"><?php echo $this->lang->line('receivings_quantity'); ?></th>
 				<th style="width:10%;"><?php echo $this->lang->line('receivings_ship_pack'); ?></th>
 				<th style="width:10%;"><?php echo $this->lang->line('receivings_discount'); ?></th>
+				<th style="width:10%;"><?php echo $this->lang->line('receivings_tax'); ?></th>
 				<th style="width:10%;"><?php echo $this->lang->line('receivings_total'); ?></th>
 				<th style="width:5%;"><?php echo $this->lang->line('receivings_update'); ?></th>
 			</tr>
@@ -119,7 +120,7 @@ if (isset($success))
 			{
 			?>
 				<tr>
-					<td colspan='8'>
+					<td colspan='9'>
 						<div class='alert alert-dismissible alert-info'><?php echo $this->lang->line('sales_no_items_in_cart'); ?></div>
 					</td>
 				</tr>
@@ -174,7 +175,19 @@ if (isset($success))
 							<?php
 							}
 							?>
-							<td><?php echo to_currency($item['price']*$item['quantity']*$item['receiving_quantity']-$item['price']*$item['quantity']*$item['receiving_quantity']*$item['discount']/100); ?></td> 
+
+                            <td><?php echo form_input(array('name'=>'tax', 'class'=>'form-control input-sm', 'value'=>$item['tax']));?></td>
+
+                            <?php
+                            $sub_total = $item['price']*$item['quantity']*$item['receiving_quantity'];
+                            if ($item['discount'] > 0) {
+                                $sub_total = $sub_total - ($sub_total*$item['discount']/100);
+                            }
+                            if ($item['tax'] > 0) {
+                                $sub_total = ((100+$item['tax'])/100)*$sub_total;
+                            }
+                            ?>
+							<td><?php echo to_currency($sub_total); ?></td>
 							<td><a href="javascript:$('#<?php echo 'cart_'.$line ?>').submit();" title=<?php echo $this->lang->line('receivings_update')?> ><span class="glyphicon glyphicon-refresh"></span></a></td>
 						</tr>
 						<tr>
@@ -207,7 +220,7 @@ if (isset($success))
 								}
 								?>
 							</td>
-							<td colspan='6'></td>
+							<td colspan='7'></td>
 						</tr>
 					<?php echo form_close(); ?>
 			<?php

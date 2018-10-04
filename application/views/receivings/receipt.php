@@ -70,6 +70,7 @@
 			<th style="width:40%;"><?php echo $this->lang->line('items_item'); ?></th>
 			<th style="width:20%;"><?php echo $this->lang->line('common_price'); ?></th>
 			<th style="width:20%;"><?php echo $this->lang->line('sales_quantity'); ?></th>
+			<th style="width:20%;"><?php echo $this->lang->line('receivings_tax'); ?></th>
 			<th style="width:15%;text-align:right;"><?php echo $this->lang->line('sales_total'); ?></th>
 		</tr>
 
@@ -82,6 +83,7 @@
 				<td><?php echo to_currency($item['price']); ?></td>
 				<td><?php echo to_quantity_decimals($item['quantity']) . " " . ($show_stock_locations ? " [" . $item['stock_name'] . "]" : ""); 
 				?>&nbsp;&nbsp;&nbsp;x <?php echo $item['receiving_quantity'] != 0 ? to_quantity_decimals($item['receiving_quantity']) : 1; ?></td>
+				<td><?php echo $item['tax']; ?>%</td>
 				<td><div class="total-value"><?php echo to_currency($item['total']); ?></div></td>
 			</tr>
 			<tr>
@@ -92,7 +94,7 @@
 			{
 			?>
 				<tr>
-					<td colspan="3" style="font-weight: bold;"> <?php echo number_format($item['discount'], 0) . " " . $this->lang->line("sales_discount_included")?> </td>
+					<td colspan="4" style="font-weight: bold;"> <?php echo number_format($item['discount'], 0) . " " . $this->lang->line("sales_discount_included")?> </td>
 				</tr>
 			<?php
 			}
@@ -101,7 +103,7 @@
 		}
 		?>	
 		<tr>
-			<td colspan="3" style='text-align:right;border-top:2px solid #000000;'><?php echo $this->lang->line('sales_total'); ?></td>
+			<td colspan="4" style='text-align:right;border-top:2px solid #000000;'><?php echo $this->lang->line('sales_total'); ?></td>
 			<td style='border-top:2px solid #000000;'><div class="total-value"><?php echo to_currency($total); ?></div></td>
 		</tr>
 		<?php 
@@ -109,7 +111,7 @@
 		{
 		?>
 			<tr>
-				<td colspan="3" style='text-align:right;'><?php echo $this->lang->line('sales_payment'); ?></td>
+				<td colspan="4" style='text-align:right;'><?php echo $this->lang->line('sales_payment'); ?></td>
 				<td><div class="total-value"><?php echo $payment_type; ?></div></td>
 			</tr>
 
@@ -117,12 +119,12 @@
 			{
 			?>
 				<tr>
-					<td colspan="3" style='text-align:right;'><?php echo $this->lang->line('sales_amount_tendered'); ?></td>
+					<td colspan="4" style='text-align:right;'><?php echo $this->lang->line('sales_amount_tendered'); ?></td>
 					<td><div class="total-value"><?php echo to_currency($amount_tendered); ?></div></td>
 				</tr>
 
 				<tr>
-					<td colspan="3" style='text-align:right;'><?php echo $this->lang->line('sales_change_due'); ?></td>
+					<td colspan="4" style='text-align:right;'><?php echo $this->lang->line('sales_change_due'); ?></td>
 					<td><div class="total-value"><?php echo $amount_change; ?></div></td>
 				</tr>
 			<?php

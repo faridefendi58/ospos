@@ -90,6 +90,7 @@ class Receivings extends Secure_Controller
 
 		$mode = $this->receiving_lib->get_mode();
 		$item_id_or_number_or_item_kit_or_receipt = $this->input->post('item');
+		$quantity = 1;
 		$this->barcode_lib->parse_barcode_fields($quantity, $item_id_or_number_or_item_kit_or_receipt);
 		$quantity = ($mode == 'receive' || $mode == 'requisition') ? $quantity : -$quantity;
 		$item_location = $this->receiving_lib->get_stock_source();
@@ -117,18 +118,20 @@ class Receivings extends Secure_Controller
 		$this->form_validation->set_rules('price', 'lang:items_price', 'required|callback_numeric');
 		$this->form_validation->set_rules('quantity', 'lang:items_quantity', 'required|callback_numeric');
 		$this->form_validation->set_rules('discount', 'lang:items_discount', 'required|callback_numeric');
+		$this->form_validation->set_rules('tax', 'lang:receivings_tax', 'required|callback_numeric');
 
 		$description = $this->input->post('description');
 		$serialnumber = $this->input->post('serialnumber');
 		$price = parse_decimals($this->input->post('price'));
 		$quantity = parse_decimals($this->input->post('quantity'));
 		$discount = parse_decimals($this->input->post('discount'));
+		$tax = parse_decimals($this->input->post('tax'));
 		$item_location = $this->input->post('location');
 		$receiving_quantity = $this->input->post('receiving_quantity');
 
 		if($this->form_validation->run() != FALSE)
 		{
-			$this->receiving_lib->edit_item($item_id, $description, $serialnumber, $quantity, $discount, $price, $receiving_quantity);
+			$this->receiving_lib->edit_item($item_id, $description, $serialnumber, $quantity, $discount, $price, $receiving_quantity, $tax);
 		}
 		else
 		{
@@ -325,6 +328,7 @@ class Receivings extends Secure_Controller
 	private function _reload($data = array())
 	{
 		$data['cart'] = $this->receiving_lib->get_cart();
+		//var_dump($data['cart']); exit;
 		$data['modes'] = array('receive' => $this->lang->line('receivings_receiving'), 'return' => $this->lang->line('receivings_return'));
 		$data['mode'] = $this->receiving_lib->get_mode();
 		$data['stock_locations'] = $this->Stock_location->get_allowed_locations('receivings');
@@ -363,6 +367,8 @@ class Receivings extends Secure_Controller
 		}
 		
 		$data['print_after_sale'] = $this->receiving_lib->is_print_after_sale();
+
+        $data['tax'] = 0;
 
 		$data = $this->xss_clean($data);
 
