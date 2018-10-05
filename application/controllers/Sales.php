@@ -1121,6 +1121,9 @@ class Sales extends Secure_Controller
         if (isset($_COOKIE['sales_doctor_address'])) {
             $data['partners']['alamat_dokter'] = $_COOKIE['sales_doctor_address'];
         }
+        if (isset($_COOKIE['partner_code'])) {
+            $data['partners']['partner_code'] = $_COOKIE['partner_code'];
+        }
 
 		$data = $this->xss_clean($data);
 
@@ -1492,6 +1495,17 @@ class Sales extends Secure_Controller
     public function suggest_doctor()
     {
         $suggestions = $this->xss_clean($this->Partner->get_search_doctor_suggestions($this->input->get('nama_dokter'), TRUE));
+        if (isset($_GET['code']) && $_GET['code'] == 1 && count($suggestions) > 0) {
+        	$items = [];
+			foreach ($suggestions as $suggestion) {
+                $items[] = [
+                	'label' => $suggestion['partner_code'].' - '.$suggestion['label'],
+                	'doctor_name' => $suggestion['label'],
+                	'address' => $suggestion['address'],
+				];
+			}
+            $suggestions = $items;
+		}
 
         echo json_encode($suggestions);
     }

@@ -335,6 +335,10 @@ class Partner extends CI_Model
             unset($_COOKIE['sales_doctor_address']);
             setcookie('sales_doctor_address', null, -1, '/');
         }
+        if (isset($_COOKIE['partner_code'])) {
+            unset($_COOKIE['partner_code']);
+            setcookie('partner_code', null, -1, '/');
+        }
     }
 }
 ?>

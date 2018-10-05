@@ -392,7 +392,7 @@ if(isset($success))
 			else
 			{
 			?>
-				<div class="form-group" id="select_customer">
+				<div class="form-group" id="select_customer" <?php if ($price_list_code == 'HJD'):?>style="display: none;"<?php endif; ?>>
 					<label id="customer_label" for="customer" class="control-label" style="margin-bottom: 1em; margin-top: -1em;"><?php echo $this->lang->line('sales_select_customer') . ' ' . $customer_required; ?></label>
 					<?php echo form_input(array('name'=>'customer', 'id'=>'customer', 'class'=>'form-control input-sm', 'value'=>$this->lang->line('sales_start_typing_customer_name')));?>
 
