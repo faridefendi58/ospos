@@ -211,7 +211,11 @@ class Receivings extends Secure_Controller
 		$data['stock_location'] = $this->receiving_lib->get_stock_source();
 		if($this->input->post('amount_tendered') != NULL)
 		{
-			$data['amount_tendered'] = $this->input->post('amount_tendered');
+            $data['amount_tendered'] = $this->input->post('amount_tendered');
+			if (strpos($this->input->post('amount_tendered'), ",") !== false) {
+                $data['amount_tendered'] = $this->money_unformat($this->input->post('amount_tendered'));
+			}
+
 			$data['amount_change'] = to_currency($data['amount_tendered'] - $data['total']);
 		}
 		
@@ -405,5 +409,15 @@ class Receivings extends Secure_Controller
 
 		$this->_reload();
 	}
+
+    public function money_unformat($number, $thousand='.', $decimal=',')
+    {
+        if (strstr($number, $thousand))
+            $number = str_replace($thousand, '', $number);
+        if (strstr($number, $decimal))
+            $number = str_replace($decimal, '.', $number);
+
+        return $number;
+    }
 }
 ?>

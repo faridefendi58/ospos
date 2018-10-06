@@ -109,7 +109,11 @@ class Partner extends CI_Model
             }
         }
 
-        $n = (int)$this->get_max_number()->max + 1;
+        $max_number = 0;
+        if (is_object($this->get_max_number()))
+            $max_number = (int)$this->get_max_number()->max;
+
+        $n = $max_number + 1;
         return str_pad($n, 5, "0", STR_PAD_LEFT);;
     }
 

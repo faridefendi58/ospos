@@ -8,7 +8,7 @@
 
 <div id="page_subtitle"><?php echo $subtitle ?></div>
 
-<div id="title_bar" class="button-toolbar">
+<div id="title_bar" class="button-toolbar no-print">
     <a href="javascript:printdocument();"><div class="btn btn-info btn-sm", id="show_print_button"><?php echo '<span class="glyphicon glyphicon-print">&nbsp</span>' . $this->lang->line('common_print'); ?></div></a>
 </div>
 

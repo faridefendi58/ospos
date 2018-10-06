@@ -647,6 +647,7 @@ if(isset($success))
 	</div>
 </div>
 
+<script src="js/jquery.maskMoney.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function()
 {
@@ -904,6 +905,9 @@ $(document).ready(function()
 	$('[name="price"],[name="quantity"],[name="discount"],[name="description"],[name="serialnumber"],[name="discounted_total"]').change(function() {
 		$(this).parents("tr").prevAll("form:first").submit()
 	});
+
+    //money mask
+    $("input[name='amount_tendered']").maskMoney({prefix:'', allowNegative: false, thousands:'.', decimal:',', affixesStay: false});
 });
 
 function check_payment_type()

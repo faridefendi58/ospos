@@ -4,6 +4,10 @@
 
 <div id="page_subtitle"><?php echo $subtitle ?></div>
 
+<div id="title_bar" class="button-toolbar no-print">
+    <a href="javascript:printdocument();"><div class="btn btn-info btn-sm", id="show_print_button"><?php echo '<span class="glyphicon glyphicon-print">&nbsp</span>' . $this->lang->line('common_print'); ?></div></a>
+</div>
+
 <div id="table_holder">
 	<table id="table"></table>
 </div>
@@ -88,6 +92,68 @@
 
 		init_dialog();
 	});
+    function printdocument()
+    {
+        // install firefox addon in order to use this plugin
+        if (window.jsPrintSetup)
+        {
+            // set top margins in millimeters
+            jsPrintSetup.setOption('marginTop', '<?php echo $this->config->item('print_top_margin'); ?>');
+            jsPrintSetup.setOption('marginLeft', '<?php echo $this->config->item('print_left_margin'); ?>');
+            jsPrintSetup.setOption('marginBottom', '<?php echo $this->config->item('print_bottom_margin'); ?>');
+            jsPrintSetup.setOption('marginRight', '<?php echo $this->config->item('print_right_margin'); ?>');
+
+            <?php if (!$this->config->item('print_header'))
+            {
+            ?>
+            // set page header
+            jsPrintSetup.setOption('headerStrLeft', '');
+            jsPrintSetup.setOption('headerStrCenter', '');
+            jsPrintSetup.setOption('headerStrRight', '');
+            <?php
+            }
+            if (!$this->config->item('print_footer'))
+            {
+            ?>
+            // set empty page footer
+            jsPrintSetup.setOption('footerStrLeft', '');
+            jsPrintSetup.setOption('footerStrCenter', '');
+            jsPrintSetup.setOption('footerStrRight', '');
+            <?php
+            }
+            ?>
+
+            var printers = jsPrintSetup.getPrintersList().split(',');
+            // get right printer here..
+            for(var index in printers) {
+                var default_ticket_printer = window.localStorage && localStorage['invoice_printer'];
+                var selected_printer = printers[index];
+                if (selected_printer == default_ticket_printer) {
+                    // select epson label printer
+                    jsPrintSetup.setPrinter(selected_printer);
+                    // clears user preferences always silent print value
+                    // to enable using 'printSilent' option
+                    jsPrintSetup.clearSilentPrint();
+                    <?php if (!$this->config->item('print_silently'))
+                    {
+                    ?>
+                    // Suppress print dialog (for this context only)
+                    jsPrintSetup.setOption('printSilent', 1);
+                    <?php
+                    }
+                    ?>
+                    // Do Print
+                    // When print is submitted it is executed asynchronous and
+                    // script flow continues after print independently of completetion of print process!
+                    jsPrintSetup.print();
+                }
+            }
+        }
+        else
+        {
+            window.print();
+        }
+    }
 </script>
 
 <?php $this->load->view("partial/footer"); ?>
