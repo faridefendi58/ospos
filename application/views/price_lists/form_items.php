@@ -58,6 +58,12 @@
 
 <?php echo form_close(); ?>
 
+<?php if(!empty($price_list_info->name) && $this->config->item('restrict_update_data')): ?>
+    <style>
+        .bootstrap-dialog-footer-buttons{display: none !important;}
+    </style>
+<?php endif; ?>
+
 <script type="text/javascript">
     //validation and submit handling
     $(document).ready(function() {

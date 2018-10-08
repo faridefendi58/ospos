@@ -44,4 +44,5 @@ $lang["price_lists_status_disabled"] = "Disabled";
 $lang["price_lists_default"] = "Default";
 $lang["price_lists_default_yes"] = "Yes";
 $lang["price_lists_default_no"] = "No";
+$lang["price_lists_item_name"] = "Pricelist item name";
 

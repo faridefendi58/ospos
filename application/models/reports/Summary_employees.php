@@ -21,6 +21,7 @@ class Summary_employees extends Summary_report
 		parent::_select($inputs);
 
 		$this->db->select('
+				employee_p.person_id,
 				MAX(CONCAT(employee_p.first_name, " ", employee_p.last_name)) AS employee,
 				SUM(sales_items.quantity_purchased) AS quantity_purchased
 		');

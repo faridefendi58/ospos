@@ -556,3 +556,6 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+
+// disabled update data, expecially price, set it to be false for normal ospos
+$config['restrict_update_data'] = true;

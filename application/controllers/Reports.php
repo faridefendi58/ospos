@@ -276,14 +276,20 @@ class Reports extends Secure_Controller
 				'tax' => to_currency_tax($row['tax']),
 				'total' => to_currency($row['total']),
 				'cost' => to_currency($row['cost']),
-				'profit' => to_currency($row['profit'])
+				'profit' => to_currency($row['profit']),
+				'action' => anchor('reports/specific_employee/' . $start_date.'/'.$end_date.'/'.$row['person_id'].'/'.$sale_type, '<span class="glyphicon glyphicon-search"></span>',
+					array('title' => $this->lang->line('reports_detailed_reports'))
+				)
 			));
 		}
+
+		$headers = $model->getDataColumns();
+		$headers[count($headers)] = array('action' => 'action', 'sorter' => 'number_sorter');
 
 		$data = array(
 			'title' => $this->lang->line('reports_employees_summary_report'),
 			'subtitle' => $this->_get_subtitle_report(array('start_date' => $start_date, 'end_date' => $end_date)),
-			'headers' => $this->xss_clean($model->getDataColumns()),
+			'headers' => $headers,
 			'data' => $tabular_data,
 			'summary_data' => $summary
 		);
@@ -1316,6 +1322,7 @@ class Reports extends Secure_Controller
 
 		$show_locations = $this->xss_clean($this->Stock_location->multiple_locations());
 
+		$total_each_status = array();
 		foreach($report_data['summary'] as $key => $row)
 		{
 			$summary_data[] = $this->xss_clean(array(
@@ -1333,6 +1340,12 @@ class Reports extends Secure_Controller
 					array('class' => 'modal-dlg print_hide', 'data-btn-delete' => $this->lang->line('common_delete'), 'data-btn-submit' => $this->lang->line('common_submit'), 'title' => $this->lang->line('receivings_update'))
 				)
 			));
+
+			if (in_array($row['payment_type'], array_keys($total_each_status))) {
+                $total_each_status[$row['payment_type']] = $total_each_status[$row['payment_type']] + $row['total'];
+			} else {
+                $total_each_status[$row['payment_type']] = $row['total'];
+			}
 
 			foreach($report_data['details'][$key] as $drow)
 			{
@@ -1358,7 +1371,8 @@ class Reports extends Secure_Controller
 			'editable' => 'receivings',
 			'summary_data' => $summary_data,
 			'details_data' => $details_data,
-			'overall_summary_data' => $this->xss_clean($model->getSummaryData($inputs))
+			'overall_summary_data' => $this->xss_clean($model->getSummaryData($inputs)),
+			'total_each_status' => $total_each_status
 		);
 
 		$this->load->view('reports/tabular_details', $data);

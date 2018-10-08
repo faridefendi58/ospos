@@ -44,3 +44,4 @@ $lang["price_lists_default_no"] = "No";
 $lang["price_lists_id"] = "ID";
 $lang["price_lists_code"] = "Kode";
 $lang["price_lists_item_new"] = "Item Daftar Harga Baru";
+$lang["price_lists_item_name"] = "Nama daftar harga";
