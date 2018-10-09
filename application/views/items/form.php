@@ -141,12 +141,18 @@
 					<?php if (!currency_side()): ?>
 						<span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
 					<?php endif; ?>
-					<?php echo form_input(array(
-							'name'=>'cost_price',
-							'id'=>'cost_price',
-							'class'=>'form-control input-sm',
-							'value'=>to_currency_no_money($item_info->cost_price))
-							);?>
+                    <?php
+                    $cost_price_params = array(
+                        'name'=>'cost_price',
+                        'id'=>'cost_price',
+                        'class'=>'form-control input-sm',
+                        'value'=>to_currency_no_money($item_info->cost_price)
+                    );
+                    if (!empty($item_info->name) && $this->config->item('restrict_update_data')) {
+                        $cost_price_params['readOnly'] = true;
+                    }
+                    ?>
+					<?php echo form_input($cost_price_params);?>
 					<?php if (currency_side()): ?>
 						<span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
 					<?php endif; ?>
@@ -161,12 +167,18 @@
 					<?php if (!currency_side()): ?>
 						<span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
 					<?php endif; ?>
-					<?php echo form_input(array(
-							'name'=>'unit_price',
-							'id'=>'unit_price',
-							'class'=>'form-control input-sm',
-							'value'=>to_currency_no_money($item_info->unit_price))
-							);?>
+                    <?php
+                    $unit_price_params = array(
+                        'name'=>'unit_price',
+                        'id'=>'unit_price',
+                        'class'=>'form-control input-sm',
+                        'value'=>to_currency_no_money($item_info->unit_price)
+                    );
+                    if (!empty($item_info->name) && $this->config->item('restrict_update_data')) {
+                        $unit_price_params['readOnly'] = true;
+                    }
+                    ?>
+					<?php echo form_input($unit_price_params);?>
 					<?php if (currency_side()): ?>
 						<span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
 					<?php endif; ?>

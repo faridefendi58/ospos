@@ -45,12 +45,18 @@
         <div class='col-xs-8'>
             <div class="input-group input-group-sm">
                 <span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
-                <?php echo form_input(array(
-                        'name' => 'unit_price',
-                        'id' => 'unit_price',
-                        'class' => 'form-control input-sm',
-                        'value' => to_currency_no_money($price_list_item_info->unit_price))
-                );?>
+                <?php
+                $unit_price_params = array(
+                    'name' => 'unit_price',
+                    'id' => 'unit_price',
+                    'class' => 'form-control input-sm',
+                    'value' => to_currency_no_money($price_list_item_info->unit_price)
+                );
+                if (!empty($price_list_item_info->unit_price) && $this->config->item('restrict_update_data')) {
+                    $unit_price_params['readOnly'] = true;
+                }
+                ?>
+                <?php echo form_input($unit_price_params);?>
             </div>
         </div>
     </div>
