@@ -1107,9 +1107,10 @@ class Sales extends Secure_Controller
 			$data['customer_required'] = $this->lang->line('sales_customer_optional');
 		}
 
-		$data['price_lists'] = $this->Price_list->get_list_options();
+		$data['price_lists'] = $this->Price_list->get_list_options('description');
 		$data['price_list_default'] = $this->sale_lib->get_price_list();
-		$data['price_list_code'] = $data['price_lists'][$data['price_list_default']];
+        $data['price_list_codes'] = $this->Price_list->get_list_options('code');
+		$data['price_list_code'] = $data['price_list_codes'][$data['price_list_default']];
 		//get the cookie of sales another data
 		$data['partners'] = [];
 		if (isset($_COOKIE['sales_patient'])) {
@@ -1524,6 +1525,32 @@ class Sales extends Secure_Controller
         }
 
         return $partner;
+	}
+
+    /**
+     * change each item price on select pricelist
+     */
+	public function change_item_price()
+	{
+		$item_id = $this->input->get('item_id');
+		$price_list_id = $this->input->get('price_list_id');
+
+		$price = $this->Price_list->get_unit_price($price_list_id, $item_id);
+        $cart = $this->sale_lib->get_cart();
+        $x = $this->search_cart_for_item_id($item_id, $cart);
+
+        $result = [ 'success' => false, 'price' => $price ];
+        if($x != NULL)
+        {
+            $cart[$x]['price'] = $price;
+            $cart[$x]['total'] = $price * $cart[$x]['quantity'];
+            $cart[$x]['discounted_total'] = $this->sale_lib->get_item_total($cart[$x]['quantity'], $price, $cart[$x]['discount'], TRUE);
+            $cart[$x]['price_list_id'] = $price_list_id;
+            $this->sale_lib->set_cart($cart);
+            $result = [ 'success' => true, 'price' => $price ];
+        }
+
+        echo json_encode( $result );
 	}
 }
 ?>

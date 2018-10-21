@@ -166,3 +166,4 @@ $lang["sales_work_order_unsent"] = "Work Order failed to be sent to";
 $lang["sales_patient_name"] = "Patient Name";
 $lang["sales_doctor_name"] = "Doctor Name";
 $lang["sales_doctor_address"] = "Doctor Address";
+$lang["sales_price_type"] = "Price Type";

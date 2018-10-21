@@ -174,7 +174,7 @@ class Price_list extends CI_Model
         return $this->db->get()->result();
     }
 
-    public function get_list_options() {
+    public function get_list_options($col = 'code') {
         $this->db->from('price_lists');
         $this->db->where('enabled', 1);
         $this->db->order_by('code', 'asc');
@@ -187,7 +187,13 @@ class Price_list extends CI_Model
         }
 
         foreach ($query->result() as $result) {
-            $items[$result->id] = $result->code;
+            if ($col == 'code') {
+                $items[$result->id] = $result->code;
+            } elseif ($col == 'name') {
+                $items[$result->id] = $result->name.' ('.$result->code.')';
+            } elseif ($col == 'description') {
+                $items[$result->id] = $result->description;
+            }
         }
 
         return $items;

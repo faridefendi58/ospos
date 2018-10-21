@@ -114,6 +114,7 @@ if(isset($success))
 				<th style="width: 10%;"><?php echo $this->lang->line('sales_price'); ?></th>
 				<th style="width: 10%;"><?php echo $this->lang->line('sales_quantity'); ?></th>
 				<th style="width: 10%;"><?php echo $this->lang->line('sales_discount'); ?></th>
+				<th style="width: 10%;"><?php echo $this->lang->line('sales_price_type'); ?></th>
 				<th style="width: 10%;"><?php echo $this->lang->line('sales_total'); ?></th>
 				<th style="width: 5%;"><?php echo $this->lang->line('sales_update'); ?></th>
 			</tr>
@@ -125,7 +126,7 @@ if(isset($success))
 			{
 			?>
 				<tr>
-					<td colspan='8'>
+					<td colspan='9'>
 						<div class='alert alert-dismissible alert-info'><?php echo $this->lang->line('sales_no_items_in_cart'); ?></div>
 					</td>
 				</tr>
@@ -199,6 +200,20 @@ if(isset($success))
 							</td>
 
 							<td><?php echo form_input(array('name'=>'discount', 'class'=>'form-control input-sm', 'value'=>to_decimals($item['discount'], 0), 'tabindex'=>++$tabindex, 'onClick'=>'this.select();'));?></td>
+                            <!-- additional for sale type -->
+                            <td>
+                                <?php
+                                echo form_dropdown(
+                                        'price_list_id',
+                                        $price_list_codes,
+                                    (isset($item['price_list_id']))? $item['price_list_id'] : $price_list_default,
+                                        array(
+                                            'class' => 'form-control input-sm',
+                                            'onChange' => 'return changePriceType(this);'
+                                        )
+                                );?>
+                            </td>
+                            <!-- endof additional for sale type -->
 							<td>
 								<?php
 								if($item['item_type'] == ITEM_AMOUNT_ENTRY)
@@ -942,6 +957,26 @@ function check_payment_type()
 		$(".giftcard-input").attr('disabled', true);
 		$(".non-giftcard-input").attr('disabled', false);
 	}
+}
+function changePriceType(dt) {
+    var item_id = $(dt).parents("tr").find("input[name='item_id']").val();
+    var price_list_id = $(dt).val();
+    $.ajax({
+        url: "<?php echo site_url($controller_name.'/change_item_price');?>",
+        method: 'get',
+        data: {
+            "item_id" : item_id,
+            "price_list_id" : price_list_id,
+        },
+        dataType: 'json',
+        success: function (data) {
+            if (data.success) {
+                window.location.href = "<?php echo site_url($controller_name);?>";
+            }
+        }
+    });
+
+    return false;
 }
 </script>
 
