@@ -285,5 +285,14 @@ class Receiving extends CI_Model
 			)'
 		);
 	}
+
+    public function get_receiving_amount($receiving_id)
+    {
+        $this->db->select('SUM(item_cost_price*quantity_purchased) as total');
+        $this->db->from('receivings_items');
+        $this->db->where('receiving_id', $receiving_id);
+
+        return $this->db->get();
+    }
 }
 ?>

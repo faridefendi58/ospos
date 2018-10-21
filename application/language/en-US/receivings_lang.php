@@ -53,3 +53,5 @@ $lang["receivings_transaction_failed"] = "Receivings transaction(s) failed.";
 $lang["receivings_unable_to_add_item"] = "Item add to Receiving failed.";
 $lang["receivings_unsuccessfully_updated"] = "Receiving update failed.";
 $lang["receivings_update"] = "Update";
+$lang["receivings_remaining_debt"] = "Remaining Debt";
+$lang["receivings_payment_amount"] = "Payment Amount";

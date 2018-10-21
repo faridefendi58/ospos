@@ -37,13 +37,29 @@
 				<?php echo form_dropdown('employee_id', $employees, $receiving_info['employee_id'], 'id="employee_id" class="form-control"');?>
 			</div>
 		</div>
-		
+
 		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('receivings_comments'), 'comment', array('class'=>'control-label col-xs-3')); ?>
 			<div class='col-xs-8'>
-				<?php echo form_textarea(array('name'=>'comment','value'=>$receiving_info['comment'], 'id'=>'comment', 'class'=>'form-control input-sm'));?>
+				<?php echo form_textarea(array('name'=>'comment','value'=>$receiving_info['comment'], 'id'=>'comment', 'class'=>'form-control input-sm', 'rows' => 2));?>
 			</div>
 		</div>
+
+        <?php if (!empty($receiving_payment_info) && ($receiving_payment_info['remaining_debt']>0)): ?>
+            <div class="form-group form-group-sm">
+                <?php echo form_label($this->lang->line('receivings_remaining_debt'), 'remaining_debt', array('class'=>'control-label col-xs-3')); ?>
+                <div class='col-xs-8'>
+                    <?php echo form_input(array('name' => 'receivings_remaining_debt', 'value' => $receiving_payment_info['remaining_debt'], 'id' => 'receivings_remaining_debt', 'class'=>'form-control input-sm', 'readOnly' => true));?>
+                </div>
+            </div>
+
+            <div class="form-group form-group-sm">
+                <?php echo form_label($this->lang->line('receivings_payment_amount'), 'payment_amount', array('class'=>'control-label col-xs-3')); ?>
+                <div class='col-xs-8'>
+                    <?php echo form_input(array('name' => 'receivings_payment_amount', 'placeholder' => $receiving_payment_info['remaining_debt'], 'id' => 'receivings_payment_amount', 'class'=>'form-control input-sm'));?>
+                </div>
+            </div>
+        <?php endif; ?>
 	</fieldset>
 <?php echo form_close(); ?>
 		

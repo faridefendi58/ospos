@@ -10,6 +10,7 @@ class Receivings extends Secure_Controller
 
 		$this->load->library('receiving_lib');
 		$this->load->library('barcode_lib');
+		$this->load->model('Receiving_payment');
 	}
 
 	public function index()
@@ -161,6 +162,15 @@ class Receivings extends Secure_Controller
 		$data['selected_supplier_name'] = !empty($receiving_info['supplier_id']) ? $receiving_info['company_name'] : '';
 		$data['selected_supplier_id'] = $receiving_info['supplier_id'];
 		$data['receiving_info'] = $receiving_info;
+        $receiving_payment_info = $this->xss_clean($this->Receiving_payment->get_last_payment_info($receiving_id)->row_array());
+        if (!is_array($receiving_payment_info)) {
+            $receiving_amount_info = $this->xss_clean($this->Receiving->get_receiving_amount($receiving_id)->row_array());
+            $receiving_payment_info = [
+            	'remaining_debt' => $receiving_amount_info['total']*1
+			];
+		}
+
+		$data['receiving_payment_info'] = $receiving_payment_info;
 	
 		$this->load->view('receivings/form', $data);
 	}
@@ -332,7 +342,7 @@ class Receivings extends Secure_Controller
 	private function _reload($data = array())
 	{
 		$data['cart'] = $this->receiving_lib->get_cart();
-		//var_dump($data['cart']); exit;
+
 		$data['modes'] = array('receive' => $this->lang->line('receivings_receiving'), 'return' => $this->lang->line('receivings_return'));
 		$data['mode'] = $this->receiving_lib->get_mode();
 		$data['stock_locations'] = $this->Stock_location->get_allowed_locations('receivings');
@@ -381,6 +391,34 @@ class Receivings extends Secure_Controller
 	
 	public function save($receiving_id = -1)
 	{
+		$receiving_info = $this->xss_clean($this->Receiving->get_receiving_amount($receiving_id)->row_array());
+		$max_payment_amount = 0;
+		if (is_array($receiving_info) && !empty($receiving_info['total'])) {
+            $max_payment_amount = $receiving_info['total']*1;
+		}
+
+		$receivings_payment_amount = $this->input->post('receivings_payment_amount');
+		if (!empty($receivings_payment_amount) && ($max_payment_amount > 0)) {
+            $receiving_payment_info = $this->xss_clean($this->Receiving_payment->get_last_payment_info($receiving_id)->row_array());
+            $remaining_debt = $receiving_payment_info['remaining_debt'];
+            if ($remaining_debt > 0) {
+            	if ($receivings_payment_amount > $remaining_debt ) {
+                    $remaining_debt = 0;
+				} else {
+                    $remaining_debt = $remaining_debt - $receivings_payment_amount;
+				}
+			} else {
+                $remaining_debt = $max_payment_amount;
+			}
+			$payment_data = [
+				'receiving_id' => $receiving_id,
+				'amount' => $receivings_payment_amount,
+				'remaining_debt' => $remaining_debt,
+				'created_at' => date("Y-m-d H:i:s")
+			];
+            $insert = $this->db->insert('receivings_payments', $payment_data);
+		}
+
 		$newdate = $this->input->post('date');
 		
 		$date_formatter = date_create_from_format($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), $newdate);

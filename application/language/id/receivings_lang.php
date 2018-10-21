@@ -53,3 +53,5 @@ $lang["receivings_transaction_failed"] = "Transaksi Penerimaan Salah";
 $lang["receivings_unable_to_add_item"] = "Item tidak dapat ditambahkan ke penerimaan barang masuk";
 $lang["receivings_unsuccessfully_updated"] = "Tidak Berhasil Diperbaharui";
 $lang["receivings_update"] = "Ubah";
+$lang["receivings_remaining_debt"] = "Sisa Hutang";
+$lang["receivings_payment_amount"] = "Jumlah Pembayaran";

@@ -25,6 +25,7 @@ class Reports extends Secure_Controller
 		}
 
 		$this->load->helper('report');
+        $this->load->model('Receiving_payment');
 	}
 
 	//Initial Report listing screen
@@ -1325,6 +1326,7 @@ class Reports extends Secure_Controller
 		$total_each_status = array();
 		foreach($report_data['summary'] as $key => $row)
 		{
+			$row['remaining_debt'] = $this->get_remaining_debt($row);
 			$summary_data[] = $this->xss_clean(array(
 				'id' => $row['receiving_id'],
 				'receiving_date' => date($this->config->item('dateformat'), strtotime($row['receiving_date'])),
@@ -1332,8 +1334,10 @@ class Reports extends Secure_Controller
 				'employee_name' => $row['employee_name'],
 				'supplier_name' => $row['supplier_name'],
 				'total' => to_currency($row['total']),
+				'remaining_debt' => to_currency($row['remaining_debt']),
 				'profit' => to_currency($row['profit']),
 				'payment_type' => $row['payment_type'],
+				'payment_status' => $this->get_payment_status($row),
 				'reference' => $row['reference'],
 				'comment' => $row['comment'],
 				'edit' => anchor('receivings/edit/' . $row['receiving_id'], '<span class="glyphicon glyphicon-edit"></span>',
@@ -1477,5 +1481,36 @@ class Reports extends Secure_Controller
 
 		return $subtitle;
 	}
+
+	private function get_remaining_debt($data)
+	{
+		if (in_array(strtolower($data['payment_type']), ['jatuh tempo', 'due'])) {
+			$receiving_info = $this->xss_clean($this->Receiving_payment->get_last_payment_info($data['receiving_id'])->row_array());
+			if (is_array($receiving_info) && !empty($receiving_info['remaining_debt'])) {
+				$remaining_debt = $receiving_info['remaining_debt']*1;
+				return $remaining_debt;
+			}
+			return $data['total'];
+		}
+
+		return 0;
+	}
+
+    private function get_payment_status($data)
+    {
+        if (in_array(strtolower($data['payment_type']), ['jatuh tempo', 'due'])) {
+        	if (isset($data['remaining_debt'])) {
+                $remaining_debt = $data['remaining_debt'];
+			} else {
+                $remaining_debt = $this->get_remaining_debt($data);
+			}
+            // find the payment
+            if ($remaining_debt > 0) {
+            	return 'Belum Lunas';
+			}
+        }
+
+        return 'Lunas';
+    }
 }
 ?>
