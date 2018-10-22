@@ -110,3 +110,7 @@ $lang["items_upc_database"] = "Barcode Database";
 $lang["items_update"] = "Update Item";
 $lang["items_use_inventory_menu"] = "Use Inventory Menu";
 $lang["items_expiration"] = "Expiration Date";
+
+$lang["items_hju"] = "HJU";
+$lang["items_hjd"] = "HJD";
+$lang["items_hjr"] = "HJR";

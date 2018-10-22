@@ -12,6 +12,7 @@ class Items extends Secure_Controller
 		parent::__construct('items');
 
 		$this->load->library('item_lib');
+        $this->load->model('Price_list_items');
 	}
 	
 	public function index()
@@ -70,6 +71,14 @@ class Items extends Secure_Controller
 		$data_rows = array();
 		foreach($items->result() as $item)
 		{
+			// add by farid efendi on 22 okt 19, to show the HJU, HJD
+			$price_lists = $this->Price_list_items->find_all_by_item_id($item->item_id);
+			if (is_array($price_lists)) {
+				foreach ($price_lists as $hj => $hj_price) {
+                    $item->{$hj} = $hj_price*1;
+				}
+			}
+
 			$data_rows[] = $this->xss_clean(get_item_data_row($item));
 			if($item->pic_filename!='')
 			{
@@ -243,6 +252,14 @@ class Items extends Secure_Controller
 			$item_info->qty_per_pack = 1;
 			$item_info->pack_name = $this->lang->line('items_default_pack_name');
 		}
+
+		// add by farid efendi on 22 okt 18
+        $price_lists = $this->Price_list_items->find_all_by_item_id($item_info->item_id);
+        if (is_array($price_lists)) {
+            foreach ($price_lists as $hj => $hj_price) {
+                $item_info->{$hj} = $hj_price;
+            }
+        }
 
 		$data['item_info'] = $item_info;
 

@@ -399,6 +399,7 @@ class Receivings extends Secure_Controller
 
 		$receivings_payment_amount = $this->input->post('receivings_payment_amount');
 		if (!empty($receivings_payment_amount) && ($max_payment_amount > 0)) {
+			$receivings_payment_amount = $this->money_unformat($receivings_payment_amount);
             $receiving_payment_info = $this->xss_clean($this->Receiving_payment->get_last_payment_info($receiving_id)->row_array());
             $remaining_debt = $receiving_payment_info['remaining_debt'];
             if ($remaining_debt > 0) {

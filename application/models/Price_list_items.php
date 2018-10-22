@@ -154,5 +154,27 @@ class Price_list_items extends CI_Model
         $row = $query->row();
         return $row;
     }
+
+    public function find_all_by_item_id($item_id)
+    {
+        $this->db->select('v.code, t.unit_price');
+        $this->db->from('price_list_items as t');
+        $this->db->join('price_lists as v', 'v.id = t.price_list_id');
+        $this->db->where('t.item_id', $item_id);
+        $this->db->order_by('t.id', 'asc');
+
+        $query = $this->db->get();
+
+        $items = [];
+        if($query->num_rows() == 0) {
+            return false;
+        }
+
+        foreach ($query->result() as $result) {
+            $items[$result->code] = $result->unit_price;
+        }
+
+        return $items;
+    }
 }
 ?>

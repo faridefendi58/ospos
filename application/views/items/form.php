@@ -161,7 +161,20 @@
 		</div>
 
 		<div class="form-group form-group-sm">
-			<?php echo form_label($this->lang->line('items_unit_price'), 'unit_price', array('class'=>'required control-label col-xs-3')); ?>
+			<?php echo form_label($this->lang->line('items_hju'), 'unit_price', array('class'=>'required control-label col-xs-3')); ?>
+            <div class="col-xs-3">
+                <div class="input-group input-group-sm">
+                    <?php echo form_input(array(
+                            'name' => 'percent_hju',
+                            'id' => 'percent_hju',
+                            'class' => 'form-control input-sm',
+                            'value' => round((($item_info->unit_price - $item_info->cost_price)/$item_info->cost_price * 100),2),
+                            'readOnly' => (!empty($item_info->name) && $this->config->item('restrict_update_data'))
+                        )
+                    );?>
+                    <span class="input-group-addon input-sm"><b>%</b></span>
+                </div>
+            </div>
 			<div class='col-xs-4'>
 				<div class="input-group input-group-sm">
 					<?php if (!currency_side()): ?>
@@ -185,6 +198,88 @@
 				</div>
 			</div>
 		</div>
+
+        <?php if (property_exists($item_info, 'HJD')) :?>
+            <div class="form-group form-group-sm">
+                <?php echo form_label($this->lang->line('items_hjd'), 'hjd', array('class'=>'control-label col-xs-3')); ?>
+                <div class="col-xs-3">
+                    <div class="input-group input-group-sm">
+                        <?php echo form_input(array(
+                                'name' => 'percent_hjd',
+                                'id' => 'percent_hjd',
+                                'class' => 'form-control input-sm',
+                                'value' => round((($item_info->HJD - $item_info->cost_price)/$item_info->cost_price * 100), 2),
+                                'readOnly' => (!empty($item_info->name) && $this->config->item('restrict_update_data'))
+                            )
+                        );?>
+                        <span class="input-group-addon input-sm"><b>%</b></span>
+                    </div>
+                </div>
+                <div class='col-xs-4'>
+                    <div class="input-group input-group-sm">
+                        <?php if (!currency_side()): ?>
+                            <span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
+                        <?php endif; ?>
+                        <?php
+                        $hjd_price_params = array(
+                            'name'=>'hjd',
+                            'id'=>'hjd',
+                            'class'=>'form-control input-sm',
+                            'value'=>to_currency_no_money($item_info->HJD)
+                        );
+                        if (!empty($item_info->name) && $this->config->item('restrict_update_data')) {
+                            $hjd_price_params['readOnly'] = true;
+                        }
+                        ?>
+                        <?php echo form_input($hjd_price_params);?>
+                        <?php if (currency_side()): ?>
+                            <span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endif ; ?>
+
+        <?php if (property_exists($item_info, 'HJR')) :?>
+            <div class="form-group form-group-sm">
+                <?php echo form_label($this->lang->line('items_hjr'), 'hjr', array('class'=>'control-label col-xs-3')); ?>
+                <div class="col-xs-3">
+                    <div class="input-group input-group-sm">
+                        <?php echo form_input(array(
+                                'name' => 'percent_hjr',
+                                'id' => 'percent_hjr',
+                                'class' => 'form-control input-sm',
+                                'value' => round((($item_info->HJR - $item_info->cost_price)/$item_info->cost_price * 100), 2),
+                                'readOnly' => (!empty($item_info->name) && $this->config->item('restrict_update_data'))
+                            )
+                        );?>
+                        <span class="input-group-addon input-sm"><b>%</b></span>
+                    </div>
+                </div>
+                <div class='col-xs-4'>
+                    <div class="input-group input-group-sm">
+                        <?php if (!currency_side()): ?>
+                            <span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
+                        <?php endif; ?>
+                        <?php
+                        $hjd_price_params = array(
+                            'name'=>'hjr',
+                            'id'=>'hjr',
+                            'class'=>'form-control input-sm',
+                            'value'=>to_currency_no_money($item_info->HJR)
+                        );
+                        if (!empty($item_info->name) && $this->config->item('restrict_update_data')) {
+                            $hjd_price_params['readOnly'] = true;
+                        }
+                        ?>
+                        <?php echo form_input($hjd_price_params);?>
+                        <?php if (currency_side()): ?>
+                            <span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endif ; ?>
 
 		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('items_tax_1'), 'tax_percent_1', array('class'=>'control-label col-xs-3')); ?>

@@ -49,20 +49,21 @@
             <div class="form-group form-group-sm">
                 <?php echo form_label($this->lang->line('receivings_remaining_debt'), 'remaining_debt', array('class'=>'control-label col-xs-3')); ?>
                 <div class='col-xs-8'>
-                    <?php echo form_input(array('name' => 'receivings_remaining_debt', 'value' => $receiving_payment_info['remaining_debt'], 'id' => 'receivings_remaining_debt', 'class'=>'form-control input-sm', 'readOnly' => true));?>
+                    <?php echo form_input(array('name' => 'receivings_remaining_debt', 'value' => to_currency_no_money($receiving_payment_info['remaining_debt']), 'id' => 'receivings_remaining_debt', 'class'=>'form-control input-sm', 'readOnly' => true));?>
                 </div>
             </div>
 
             <div class="form-group form-group-sm">
                 <?php echo form_label($this->lang->line('receivings_payment_amount'), 'payment_amount', array('class'=>'control-label col-xs-3')); ?>
                 <div class='col-xs-8'>
-                    <?php echo form_input(array('name' => 'receivings_payment_amount', 'placeholder' => $receiving_payment_info['remaining_debt'], 'id' => 'receivings_payment_amount', 'class'=>'form-control input-sm'));?>
+                    <?php echo form_input(array('name' => 'receivings_payment_amount', 'placeholder' => to_currency_no_money($receiving_payment_info['remaining_debt']), 'id' => 'receivings_payment_amount', 'class'=>'form-control input-sm money'));?>
                 </div>
             </div>
         <?php endif; ?>
 	</fieldset>
 <?php echo form_close(); ?>
-		
+
+<script src="js/jquery.maskMoney.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function()
 {
@@ -130,5 +131,8 @@ $(document).ready(function()
 			});
 		}
 	}, form_support.error));
+
+    //money mask
+    $(".money").maskMoney({prefix:'', allowNegative: false, thousands:'.', decimal:',', affixesStay: false});
 });
 </script>
