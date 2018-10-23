@@ -126,6 +126,7 @@ $(document).ready(function()
 				{
 					dialog_support.hide();
 					table_support.handle_submit("<?php echo site_url($controller_name); ?>", response);
+                    window.location.reload(true);
 				},
 				dataType: 'json'
 			});

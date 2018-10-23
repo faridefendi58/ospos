@@ -357,6 +357,7 @@ class Receiving_lib
 
 	public function get_item_total($quantity, $price, $discount_percentage, $receiving_quantity, $tax = 0)
 	{
+		// add by farid efendi, perhitungan harga kena pajak
 		if ($tax > 0) {
 			$price = ((100+$tax)/100)*$price;
 		}

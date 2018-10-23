@@ -1345,10 +1345,16 @@ class Reports extends Secure_Controller
 				)
 			));
 
+            $pay_tot = $row['total'];
+            if (in_array(strtolower($row['payment_type']), ['jatuh tempo', 'due'])) {
+            	$remaining_debt = $row['remaining_debt']*1;
+            	$pay_tot = $remaining_debt;
+            }
+
 			if (in_array($row['payment_type'], array_keys($total_each_status))) {
-                $total_each_status[$row['payment_type']] = $total_each_status[$row['payment_type']] + $row['total'];
+                $total_each_status[$row['payment_type']] = $total_each_status[$row['payment_type']] + $pay_tot;
 			} else {
-                $total_each_status[$row['payment_type']] = $row['total'];
+                $total_each_status[$row['payment_type']] = $pay_tot;
 			}
 
 			foreach($report_data['details'][$key] as $drow)
@@ -1490,7 +1496,7 @@ class Reports extends Secure_Controller
 				$remaining_debt = $receiving_info['remaining_debt']*1;
 				return $remaining_debt;
 			}
-			return $data['total'];
+			return $data['total']*1;
 		}
 
 		return 0;

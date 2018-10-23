@@ -13,21 +13,28 @@
 </div>
 
 <div id="report_summary">
-    <?php if (isset($total_each_status) && is_array($total_each_status)):?>
+    <?php
+    $sum_data = 0;
+    if (isset($total_each_status) && is_array($total_each_status)):?>
         <?php foreach ($total_each_status as $status => $tot_status): ?>
             <div class="summary_row">
                 <?php echo '<b>Total '. $status. '</b>: '.to_currency($tot_status); ?>
             </div>
+            <?php $sum_data = $sum_data + $tot_status; ?>
         <?php endforeach; ?>
     <?php endif; ?>
 
+    <div class="summary_row">
+        <?php echo '<b>'.$this->lang->line('reports_total'). '</b>: '.to_currency($sum_data); ?>
+    </div>
+
 	<?php
-	foreach($overall_summary_data as $name=>$value)
+	/*foreach($overall_summary_data as $name=>$value)
 	{
 	?>
 		<div class="summary_row"><?php echo '<b>'.$this->lang->line('reports_'.$name). '</b>: '.to_currency($value); ?></div>
 	<?php
-	}
+	}*/
 	?>
 </div>
 
