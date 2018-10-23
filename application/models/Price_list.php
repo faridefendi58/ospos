@@ -252,5 +252,17 @@ class Price_list extends CI_Model
 
         return round($unit_price, 3);
     }
+
+    public function find_one_by_code($code)
+    {
+        $this->db->select('id, code');
+
+        $this->db->from('price_lists');
+        $this->db->where('code', $code);
+
+        $query = $this->db->get();
+
+        return $query->row();
+    }
 }
 ?>

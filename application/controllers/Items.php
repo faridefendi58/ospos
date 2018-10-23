@@ -12,6 +12,7 @@ class Items extends Secure_Controller
 		parent::__construct('items');
 
 		$this->load->library('item_lib');
+        $this->load->model('Price_list');
         $this->load->model('Price_list_items');
 	}
 	
@@ -561,6 +562,37 @@ class Items extends Secure_Controller
 					$success &= $this->Inventory->insert($inv_data);
 				}
 			}
+
+			// insert also the HJD, HJR
+			$hjd = $this->input->post('hjd');
+			if (isset($hjd)) {
+                $plist_hjd = $this->Price_list->find_one_by_code('HJD');
+                if (is_object($plist_hjd)) {
+                    $hjd_data = [
+                        'price_list_id' => $plist_hjd->id,
+                        'item_id' => $item_id,
+                        'unit_price' => parse_decimals($hjd),
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ];
+				}
+                $success &= $this->Price_list_items->insert($hjd_data);
+			}
+
+            $hjr = $this->input->post('hjr');
+            if (isset($hjr)) {
+                $plist_hjr = $this->Price_list->find_one_by_code('HJR');
+                if (is_object($plist_hjr)) {
+                    $hjr_data = [
+                        'price_list_id' => $plist_hjr->id,
+                        'item_id' => $item_id,
+                        'unit_price' => parse_decimals($hjr),
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ];
+                }
+                $success &= $this->Price_list_items->insert($hjr_data);
+            }
 
 			if($success && $upload_success)
 			{

@@ -176,5 +176,10 @@ class Price_list_items extends CI_Model
 
         return $items;
     }
+
+    public function insert($data)
+    {
+        return $this->db->insert('price_list_items', $data);
+    }
 }
 ?>
