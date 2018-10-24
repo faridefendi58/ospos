@@ -131,7 +131,7 @@
 							?>
 											<ul>
 												<li>
-													<?php echo form_checkbox("grant_".$permission->permission_id, $permission->permission_id, $permission->grant); ?>
+													<?php echo form_checkbox("grant_".$permission->permission_id, $permission->permission_id, $permission->grant, ['class' => 'action_permission']); ?>
 													<?php echo form_hidden("menu_group_".$permission->permission_id, "--"); ?>
 													<span class="medium"><?php echo $lang_line ?></span>
 												</li>
@@ -259,5 +259,21 @@ $(document).ready(function()
 			email: "<?php echo $this->lang->line('common_email_invalid_format'); ?>"
 		}
 	}, form_support.error));
+
+	//auto check
+    $('.module').change(function () {
+        var grant_items = $(this).parent().find('li input[type="checkbox"]');
+        if (typeof (grant_items) !== 'undefined' && grant_items.length > 0) {
+            grant_items.first().prop("checked", this.checked);
+        }
+    });
+    $('.action_permission').change(function () {
+        if (!this.checked) {
+            var checked_action = $(this).parent().parent().parent().find('.action_permission:checked');
+            if (checked_action.length == 0) {
+                $(this).parent().parent().parent().find('.module').trigger("click");
+            }
+        }
+    });
 });
 </script>

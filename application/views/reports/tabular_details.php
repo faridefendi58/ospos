@@ -24,18 +24,21 @@
         <?php endforeach; ?>
     <?php endif; ?>
 
+    <?php if ($sum_data>0): ?>
     <div class="summary_row">
         <?php echo '<b>'.$this->lang->line('reports_total'). '</b>: '.to_currency($sum_data); ?>
     </div>
+    <?php else: ?>
 
 	<?php
-	/*foreach($overall_summary_data as $name=>$value)
+	foreach($overall_summary_data as $name=>$value)
 	{
 	?>
 		<div class="summary_row"><?php echo '<b>'.$this->lang->line('reports_'.$name). '</b>: '.to_currency($value); ?></div>
 	<?php
-	}*/
+	}
 	?>
+    <?php endif; ?>
 </div>
 
 <script type="text/javascript">
